@@ -1,0 +1,13 @@
+[workspace]
+members = ["pawzip-core", "pawzip-py", "pawzip-cli"]
+resolver = "2"
+
+[workspace.package]
+version = "1.0.0"
+edition = "2021"
+license = "MIT"
+authors = ["Pawel Stalowczyk"]
+
+[profile.release]
+codegen-units = 1
+lto = true

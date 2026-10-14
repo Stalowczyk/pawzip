@@ -1,0 +1,170 @@
+[
+  {
+    "paw": "bad-magic.paw",
+    "rule": "container: the magic is not PAW"
+  },
+  {
+    "paw": "unknown-version.paw",
+    "rule": "container: unknown version"
+  },
+  {
+    "paw": "varint-too-long.paw",
+    "rule": "container: a varint longer than 10 bytes"
+  },
+  {
+    "paw": "varint-too-large.paw",
+    "rule": "container: a varint not below 2^64"
+  },
+  {
+    "paw": "block-size-zero.paw",
+    "rule": "container: B is 0"
+  },
+  {
+    "paw": "block-size-too-large.paw",
+    "rule": "container: B is 2^32 or more"
+  },
+  {
+    "paw": "extension-too-long.paw",
+    "rule": "container: L above 16"
+  },
+  {
+    "paw": "extension-bad-character.paw",
+    "rule": "container: a character not allowed in the extension"
+  },
+  {
+    "paw": "extra-too-long.paw",
+    "rule": "container: X above 65536"
+  },
+  {
+    "paw": "block-larger-than-b.paw",
+    "rule": "container: a block holds more than B bytes"
+  },
+  {
+    "paw": "unknown-mode.paw",
+    "rule": "container: a mode that is not 0-7"
+  },
+  {
+    "paw": "truncated-header.paw",
+    "rule": "container: the data ends inside a block header"
+  },
+  {
+    "paw": "truncated-body.paw",
+    "rule": "container: the data ends inside a body"
+  },
+  {
+    "paw": "crc-mismatch.paw",
+    "rule": "container: the CRC-32 doesn't match"
+  },
+  {
+    "paw": "total-mismatch.paw",
+    "rule": "container: the end record's total differs from the sum of the blocks"
+  },
+  {
+    "paw": "trailing-data.paw",
+    "rule": "container: something follows the end record"
+  },
+  {
+    "paw": "stored-wrong-length.paw",
+    "rule": "body: a stored body isn't n bytes long"
+  },
+  {
+    "paw": "delta-distance-zero.paw",
+    "rule": "body: a delta distance of 0"
+  },
+  {
+    "paw": "primary-zero.paw",
+    "rule": "body: a primary index of 0"
+  },
+  {
+    "paw": "primary-too-large.paw",
+    "rule": "body: a primary index above n"
+  },
+  {
+    "paw": "walk-row-zero.paw",
+    "rule": "body: a walk row of 0"
+  },
+  {
+    "paw": "walk-row-too-large.paw",
+    "rule": "body: a walk row above n"
+  },
+  {
+    "paw": "walk-row-mismatch.paw",
+    "rule": "body: a walk row that doesn't match the walk"
+  },
+  {
+    "paw": "map-body-empty.paw",
+    "rule": "body: an empty map body (no background byte)"
+  },
+  {
+    "paw": "range-size-too-large.paw",
+    "rule": "body: the range-coded size R exceeds the bytes left"
+  },
+  {
+    "paw": "presence-flag-2.paw",
+    "rule": "map body: a presence flag that is neither 0 nor 1"
+  },
+  {
+    "paw": "present-without-positions.paw",
+    "rule": "map body: a present byte value with no series and no leftovers"
+  },
+  {
+    "paw": "shape-index-empty-list.paw",
+    "rule": "map body: a shape symbol naming an entry of an empty list"
+  },
+  {
+    "paw": "shape-index-after-repeat.paw",
+    "rule": "map body: a shape symbol naming a missing entry (a repeated new shape moves, it isn't added)"
+  },
+  {
+    "paw": "series-unknown-type.paw",
+    "rule": "map body: a series type that is not 0 or 1"
+  },
+  {
+    "paw": "arith-step-0.paw",
+    "rule": "map body: an arithmetic series with step 0"
+  },
+  {
+    "paw": "arith-count-1.paw",
+    "rule": "map body: an arithmetic series with count 1"
+  },
+  {
+    "paw": "series-past-end.paw",
+    "rule": "map body: a series reaching position n"
+  },
+  {
+    "paw": "series-position-overflow.paw",
+    "rule": "map body: a series whose last position overflows 64 bits"
+  },
+  {
+    "paw": "series-overlap-same-value.paw",
+    "rule": "map body: a series touching a position of an earlier series of the same byte value"
+  },
+  {
+    "paw": "series-overlap-earlier-value.paw",
+    "rule": "map body: a series touching a position taken by an earlier byte value"
+  },
+  {
+    "paw": "leftover-count-too-large.paw",
+    "rule": "map body: a leftover count above the number of free slots"
+  },
+  {
+    "paw": "leftover-past-end.paw",
+    "rule": "map body: a leftover rank past the last free slot"
+  },
+  {
+    "paw": "nested-width-1.paw",
+    "rule": "map body: a nested series breaking its constraints (width-1)"
+  },
+  {
+    "paw": "nested-rows-1.paw",
+    "rule": "map body: a nested series breaking its constraints (rows-1)"
+  },
+  {
+    "paw": "nested-inner-0.paw",
+    "rule": "map body: a nested series breaking its constraints (inner-0)"
+  },
+  {
+    "paw": "nested-stride-too-small.paw",
+    "rule": "map body: a nested series breaking its constraints (stride-too-small)"
+  }
+]

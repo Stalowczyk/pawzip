@@ -1,0 +1,6 @@
+"""Type stubs for the Rust core (see rust/pawzip-py)."""
+
+def compress_block(
+    data: bytes, modes: list[int] | None = None, thorough: bool = False
+) -> tuple[int, bytes]: ...
+def decompress_block(mode_byte: int, body: bytes, n: int) -> bytes: ...

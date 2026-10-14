@@ -1,0 +1,23 @@
+.venv/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+*.paw
+
+# test vectors and fuzzer regressions are committed on purpose
+!spec/vectors/**/*.paw
+!rust/pawzip-core/tests/regressions/*.paw
+.coverage
+.coverage.*
+.hypothesis/
+.ruff_cache/
+dist/
+build/
+rust/target/
+
+# the Rust core, built into the package by `pip install -e python`
+python/src/paw/_core.*.so
+python/src/paw/_core.*.pyd
+python/src/paw/_core.pyd
+python/src/paw/_core.so
+python/src/paw/_core.pdb

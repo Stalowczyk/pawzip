@@ -1,0 +1,65 @@
+[
+  {
+    "paw": "short.extension.paw",
+    "input": "short.bin",
+    "size": 44,
+    "sha256": "b1da5290cdc48afacb1b2c5744826634af48f53af4e2122a65b1327742a4cbba",
+    "note": "stored extension 'txt'"
+  },
+  {
+    "paw": "short.header-extra.paw",
+    "input": "short.bin",
+    "size": 44,
+    "sha256": "b1da5290cdc48afacb1b2c5744826634af48f53af4e2122a65b1327742a4cbba",
+    "note": "7 bytes of optional header data, which decoders skip"
+  },
+  {
+    "paw": "short.nonminimal-container.paw",
+    "input": "short.bin",
+    "size": 44,
+    "sha256": "b1da5290cdc48afacb1b2c5744826634af48f53af4e2122a65b1327742a4cbba",
+    "note": "every container varint non-minimal (block size, extra length, n, body size, end record, total)"
+  },
+  {
+    "paw": "short.nonminimal-body.paw",
+    "input": "short.bin",
+    "size": 44,
+    "sha256": "b1da5290cdc48afacb1b2c5744826634af48f53af4e2122a65b1327742a4cbba",
+    "note": "mode 6 with a non-minimal delta distance, primary index and range-coded size"
+  },
+  {
+    "paw": "short.delta-past-end.paw",
+    "input": "short.bin",
+    "size": 44,
+    "sha256": "b1da5290cdc48afacb1b2c5744826634af48f53af4e2122a65b1327742a4cbba",
+    "note": "mode 3 with a delta distance above n (the block is unchanged)"
+  },
+  {
+    "paw": "short.delta-equal-n.paw",
+    "input": "short.bin",
+    "size": 44,
+    "sha256": "b1da5290cdc48afacb1b2c5744826634af48f53af4e2122a65b1327742a4cbba",
+    "note": "mode 6 with a delta distance of exactly n"
+  },
+  {
+    "paw": "short.padded-streams.paw",
+    "input": "short.bin",
+    "size": 44,
+    "sha256": "b1da5290cdc48afacb1b2c5744826634af48f53af4e2122a65b1327742a4cbba",
+    "note": "zero bytes after the range-coded part (counted in R) and after the raw bits"
+  },
+  {
+    "paw": "short.short-middle-block.paw",
+    "input": "short.bin",
+    "size": 44,
+    "sha256": "b1da5290cdc48afacb1b2c5744826634af48f53af4e2122a65b1327742a4cbba",
+    "note": "a first block shorter than the block size B, then a full one"
+  },
+  {
+    "paw": "shapes.repeated-new-shape.paw",
+    "input": "shapes.bin",
+    "size": 12,
+    "sha256": "60224a09a3b41cd26074b9595a674e806a086701dc00ac8c020b541c554cffa3",
+    "note": "a shape sent as new (symbol 63) while it is already in the shape list"
+  }
+]

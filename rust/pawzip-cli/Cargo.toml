@@ -1,0 +1,16 @@
+[package]
+name = "pawzip-cli"
+description = "The `paw` command: compress and decompress .paw files (pawzip)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "paw"
+path = "src/main.rs"
+
+[dependencies]
+pawzip-core = { path = "../pawzip-core" }
+clap = { version = "4.5", features = ["derive"] }
+ctrlc = "3.4"

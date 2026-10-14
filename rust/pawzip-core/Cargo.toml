@@ -1,0 +1,10 @@
+[package]
+name = "pawzip-core"
+description = "The pawzip compressor (.paw files): position map + series, core library"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+divsufsort = "2.0.0"

@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.paw binary
+*.bin binary
+*.bmp binary

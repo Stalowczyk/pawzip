@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 4 * * 1"  # weekly: long property-based run
+  workflow_dispatch:
+
+# The jobs skip private forks unless started by hand.
+jobs:
+  lint:
+    if: ${{ !github.event.repository.private || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -e "python[dev]"
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: mypy
+        working-directory: python
+      - name: Build and check the package
+        working-directory: python
+        run: python -m build && twine check --strict dist/*
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, python: "3.10" }
+          - { os: ubuntu-latest, python: "3.11" }
+          - { os: ubuntu-latest, python: "3.12" }
+          - { os: ubuntu-latest, python: "3.13" }
+          - { os: ubuntu-latest, python: "3.14" }
+          - { os: windows-latest, python: "3.13" }
+          - { os: macos-latest, python: "3.13" }
+    if: ${{ !github.event.repository.private || github.event_name == 'workflow_dispatch' }}
+    runs-on: ${{ matrix.os }}
+    env:
+      HYPOTHESIS_PROFILE: ${{ github.event_name == 'schedule' && 'thorough' || 'default' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install -e "python[dev]"  # builds the Rust core (paw._core) too
+      - run: pytest python --cov --cov-report=term
+      - name: Pure-Python reference (the test oracle), once
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.13'
+        run: pytest python -q
+        env:
+          PAW_PURE: "1"
+
+  rust:
+    if: ${{ !github.event.repository.private || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rust
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test --release -p pawzip-core -p pawzip-cli

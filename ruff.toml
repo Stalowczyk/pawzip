@@ -1,0 +1,14 @@
+# Lint/format settings for the whole repository.
+line-length = 110
+target-version = "py310"
+
+[lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["RUF001", "RUF002", "RUF003"]  # unicode maths symbols in docstrings are intentional
+
+[lint.per-file-ignores]
+"python/tests/*" = ["B011"]
+
+[lint.isort]
+known-first-party = ["paw"]
+known-local-folder = ["inputs"]
