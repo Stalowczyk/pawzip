@@ -1,3 +1,5 @@
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]
 exclude: ^spec/vectors/
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -17,3 +19,18 @@ repos:
       - id: ruff-check
         args: [--fix]
       - id: ruff-format
+  # Commit messages: Conventional Commits (https://www.conventionalcommits.org), one author.
+  # CI runs these on every commit of a pull request.
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [--strict]
+  - repo: local
+    hooks:
+      - id: single-author
+        name: no Co-authored-by trailers
+        language: pygrep
+        entry: "(?i)^co-authored-by:"
+        stages: [commit-msg]

@@ -110,7 +110,7 @@ python -m venv .venv
 .venv/bin/python -m pip install -e "python[dev]"   # Scripts/ instead of bin/ on Windows
                                                    # (needs Rust: builds paw._core; run it
                                                    # again after changing Rust code)
-.venv/bin/pre-commit install                       # lint + format on every commit
+.venv/bin/pre-commit install                       # lint, format and commit-message checks
 
 .venv/bin/python -m pytest python                  # all tests, on the Rust core
 PAW_PURE=1 .venv/bin/python -m pytest python       # the pure-Python reference
@@ -119,6 +119,10 @@ cd rust && cargo test --release -p pawzip -p pawzip-cli        # the Rust tests
 
 The pure-Python implementation is the reference: the Rust core writes exactly the same
 files, which `rust/differential.py` and the shared vectors check.
+
+Commit messages follow [Conventional Commits](https://www.conventionalcommits.org): a type
+(`feat`, `fix`, `docs`, `ci`, `build`, ...), an optional scope and a short description,
+such as `fix(python): ...`. The commit-msg hook and CI check every commit.
 
 ## License
 

@@ -27,6 +27,33 @@ jobs:
         working-directory: python
         run: python -m build && twine check --strict dist/*
 
+  commits:
+    name: commit messages
+    if: ${{ github.event_name == 'pull_request' && !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: pip install pre-commit
+      - name: Every commit of the pull request passes the commit-msg hooks
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          status=0
+          for sha in $(git rev-list --reverse "$BASE..$HEAD"); do
+            git log -1 --format=%B "$sha" > "$RUNNER_TEMP/message"
+            if ! pre-commit run --hook-stage commit-msg --commit-msg-filename "$RUNNER_TEMP/message"; then
+              echo "::error::commit $sha: $(head -n 1 "$RUNNER_TEMP/message")"
+              status=1
+            fi
+          done
+          exit $status
+
   test:
     strategy:
       fail-fast: false
