@@ -50,8 +50,8 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: pip install -e "python[dev]"  # builds the Rust core (paw._core) too
       - run: pytest python --cov --cov-report=term
-      - name: Pure-Python reference (the test oracle), once
-        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.13'
+      - name: Pure-Python reference (the test oracle), on the oldest and a recent Python
+        if: matrix.os == 'ubuntu-latest' && (matrix.python == '3.10' || matrix.python == '3.13')
         run: pytest python -q
         env:
           PAW_PURE: "1"

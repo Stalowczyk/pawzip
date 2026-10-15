@@ -3,13 +3,36 @@
 from __future__ import annotations
 
 import math
+import sys
 from collections import Counter
-from collections.abc import Iterable, Iterator, Sequence
+from collections.abc import Callable, Iterable, Iterator, Sequence
 
 from .arith import NUM_CLASSES
 
 PRIOR_WEIGHT = 1024
 ONE = 1 << 31  # fixed-point 1.0 (Q31)
+
+
+def _compensated_sum(values: Iterable[float]) -> float:
+    """sum() of floats as Python 3.12+ computes it: Neumaier-compensated, starting from 0."""
+    total = c = 0.0
+    for x in values:
+        t = total + x
+        if abs(total) >= abs(x):
+            c += (total - t) + x
+        else:
+            c += (x - t) + total
+        total = t
+    if c and math.isfinite(c):
+        total += c
+    return total
+
+
+# The cost estimates decide which series and modes the encoder picks, so they must round the
+# same way on every Python version, and as the Rust core does (python_sum). sum() of floats is
+# compensated since Python 3.12; the plain sum() of 3.10 and 3.11 could now and then pick
+# differently.
+float_sum: Callable[[Iterable[float]], float] = sum if sys.version_info >= (3, 12) else _compensated_sum
 
 
 def to_gaps(positions: Iterable[int]) -> Iterator[int]:
@@ -47,7 +70,7 @@ def estimate_bytes(gaps: Iterable[int]) -> float:
         classes[cls] += 1
         extra += nbits
     total = sum(classes.values())
-    bits = sum(c * math.log2(total / c) for c in classes.values()) + extra
+    bits = float_sum(c * math.log2(total / c) for c in classes.values()) + extra
     return bits / 8
 
 

@@ -9,6 +9,7 @@ from collections.abc import Iterable
 from enum import IntEnum
 
 from .errors import FormatError
+from .gaps import float_sum
 from .mapcodec import decode_map, encode_map
 from .transforms import (
     bwt_with_rows,
@@ -87,7 +88,7 @@ def resolve_modes(modes: Iterable[Mode | int] | None) -> tuple[Mode, ...] | None
 def _entropy(data: bytes) -> float:
     """Order-0 entropy estimate in bytes (only used to decide what is worth trying)."""
     n = len(data)
-    return sum(c * math.log2(n / c) for c in Counter(data).values()) / 8
+    return float_sum(c * math.log2(n / c) for c in Counter(data).values()) / 8
 
 
 def _pick_delta(data: bytes) -> tuple[int, bool]:

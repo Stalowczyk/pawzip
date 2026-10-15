@@ -19,7 +19,7 @@ import heapq
 from collections import Counter
 from collections.abc import Callable, Iterator, Sequence
 
-from .gaps import estimate_bytes, gap_class, position_weights, to_gaps
+from .gaps import estimate_bytes, float_sum, gap_class, position_weights, to_gaps
 
 ARITH = 0
 NESTED = 1
@@ -244,13 +244,13 @@ def select_series(
     weighed = [
         (s, covered)
         for s in _candidates(positions, position_set, bwt_output)
-        if (covered := sum(weight[p] for p in series_positions(s))) - reused_cost(s) > 0
+        if (covered := float_sum(weight[p] for p in series_positions(s))) - reused_cost(s) > 0
     ]
     cheap = known
     for _ in range(2):
 
         def savings(s: Series, cheap: frozenset[Shape] = cheap) -> float:
-            return sum(weight[p] for p in series_positions(s)) - _cost(s, cheap)
+            return float_sum(weight[p] for p in series_positions(s)) - _cost(s, cheap)
 
         scored = [(s, gain) for s, covered in weighed if (gain := covered - _cost(s, cheap)) > 0]
         for priority in PRIORITIES:

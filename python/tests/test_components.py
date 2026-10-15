@@ -6,7 +6,7 @@ import tracemalloc
 import pytest
 
 from paw.arith import BIT_ONE, NUM_CLASSES, BitModel, Decoder, Encoder, Model
-from paw.gaps import class_base, gap_class, geometric_prior, to_gaps
+from paw.gaps import _compensated_sum, class_base, float_sum, gap_class, geometric_prior, to_gaps
 from paw.mapcodec import RECENT_SHAPES, NumberModel, _Models, _put, _series_slices, decode_map, encode_map
 from paw.series import ARITH, NESTED, reused_cost, select_series, series_cost, series_positions
 from paw.transforms import bwt, delta, inverse_bwt, inverse_delta, mtf
@@ -158,6 +158,12 @@ def test_geometric_prior_edge_cases():
 def test_geometric_prior_known_table():
     # Pinned values: other implementations must reproduce this table exactly.
     assert geometric_prior(1000, 10)[:12] == [11, 11, 11, 20, 20, 38, 37, 69, 63, 112, 95, 150]
+
+
+def test_float_sum_is_compensated_on_every_version():
+    # Plain left-to-right addition loses the 1.0 next to 1e16; Python 3.12+ and the Rust core keep it.
+    assert float_sum([1e16, 1.0, -1e16]) == _compensated_sum([1e16, 1.0, -1e16]) == 1.0
+    assert _compensated_sum([]) == 0.0
 
 
 # --- range coder --------------------------------------------------------------------------

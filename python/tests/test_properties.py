@@ -1,12 +1,14 @@
 """Property-based tests: invariants that must hold for any input Hypothesis can generate."""
 
+import sys
+
 import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
 from paw import FormatError, Mode, compress, decompress
 from paw.arith import NUM_CLASSES, BitModel, Decoder, Encoder, Model
-from paw.gaps import class_base, gap_class
+from paw.gaps import _compensated_sum, class_base, gap_class
 from paw.series import select_series, series_positions
 from paw.transforms import bwt, delta, inverse_bwt, inverse_delta, inverse_mtf, mtf
 from paw.varint import Reader, write_varint
@@ -55,6 +57,12 @@ def test_varint_roundtrip(n):
     out = bytearray()
     write_varint(out, n)
     assert Reader(bytes(out)).varint() == n
+
+
+@pytest.mark.skipif(sys.version_info < (3, 12), reason="sum() of floats is compensated since Python 3.12")
+@given(st.lists(st.floats(allow_nan=False, allow_infinity=False)))
+def test_compensated_sum_matches_builtin_sum(values):
+    assert repr(_compensated_sum(values)) == repr(float(sum(values)))  # repr: exact, nan and -0.0 too
 
 
 @given(st.integers(0, 2**32 - 2))
