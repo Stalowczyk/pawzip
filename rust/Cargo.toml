@@ -1,5 +1,5 @@
 [workspace]
-members = ["pawzip-core", "pawzip-py", "pawzip-cli"]
+members = ["pawzip", "pawzip-py", "pawzip-cli"]
 resolver = "2"
 
 [workspace.package]
@@ -7,6 +7,8 @@ version = "1.0.0"
 edition = "2021"
 license = "MIT"
 authors = ["Pawel Stalowczyk"]
+repository = "https://github.com/Stalowczyk/pawzip"
+rust-version = "1.87"
 
 [profile.release]
 codegen-units = 1

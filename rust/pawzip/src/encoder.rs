@@ -35,23 +35,42 @@ const PROBE_GIVE_UP: f64 = 0.95;
 /// larger than with BWT (see the Python `blocks.py`).
 const PROBE_SKIP_PERCENT: usize = 115;
 
-/// How to compress (see the Python `paw.compress`).
+/// How to compress. The defaults suit most data.
+///
+/// ```
+/// let mut options = pawzip::CompressOptions::default();
+/// options.extension = Some("csv".into()); // restored as .csv by the paw command
+/// options.workers = 2;
+/// let paw = pawzip::compress(b"id,name\n1,paw\n", &options)?;
+/// # Ok::<(), pawzip::Error>(())
+/// ```
 #[derive(Clone, Debug)]
-pub struct Options {
+#[non_exhaustive]
+pub struct CompressOptions {
+    /// Original bytes per block; the default is [`DEFAULT_BLOCK_SIZE`] (16 MiB). Blocks are
+    /// compressed independently: larger ones usually compress a little better and need more
+    /// memory.
     pub block_size: u64,
-    /// Modes to try for each block; None means automatic.
+    /// The modes to try on each block, keeping the smallest result. `None` (the default)
+    /// chooses automatically: a sample of each large block decides which modes are worth
+    /// trying, and data that is already compressed is stored as it is.
     pub modes: Option<Vec<Mode>>,
-    /// The original file's extension (without the dot), stored in the header.
+    /// The original file's extension, stored in the header so the file can get its name
+    /// back: `"png"` or `".png"`, up to 16 ASCII letters, digits, `-` or `_`. `None` (the
+    /// default) stores none.
     pub extension: Option<String>,
-    /// Try every mode even on blocks whose sample shows they are already compressed.
+    /// Try every mode even on blocks whose sample shows they are already compressed (such as
+    /// JPEG, ZIP or video). Slower, and it rarely helps.
     pub thorough: bool,
-    /// Blocks compressed at the same time (default 1: memory grows with each extra worker).
+    /// Blocks compressed at the same time; the default is 1. Each worker needs up to about
+    /// 100 times the block size in memory, because the candidate modes of a block are tried
+    /// in parallel threads (builds for WebAssembly use no threads).
     pub workers: usize,
 }
 
-impl Default for Options {
+impl Default for CompressOptions {
     fn default() -> Self {
-        Options {
+        CompressOptions {
             block_size: DEFAULT_BLOCK_SIZE,
             modes: None,
             extension: None,
@@ -284,7 +303,7 @@ pub fn end(total: u64) -> Vec<u8> {
 }
 
 /// Check options: block size in range, extension storable ("png" or ".png").
-pub fn check_options(options: &Options) -> Result<Option<String>, String> {
+pub(crate) fn check_options(options: &CompressOptions) -> Result<Option<String>, String> {
     if !(1..=FORMAT_MAX_BLOCK_SIZE).contains(&options.block_size) {
         return Err(format!(
             "block_size must be between 1 and {FORMAT_MAX_BLOCK_SIZE} bytes"
@@ -307,25 +326,48 @@ pub fn check_options(options: &Options) -> Result<Option<String>, String> {
 }
 
 /// Compress data into a complete .paw file.
-pub fn compress(data: &[u8], options: &Options) -> Result<Vec<u8>, String> {
+///
+/// Fails only with [`Error::Invalid`], when an option is out of range.
+///
+/// ```
+/// let data = b"the quick brown fox jumps over the lazy dog ".repeat(100);
+/// let paw = pawzip::compress(&data, &Default::default())?;
+/// assert!(paw.len() < data.len());
+/// assert_eq!(pawzip::decompress(&paw, &Default::default())?, data);
+/// # Ok::<(), pawzip::Error>(())
+/// ```
+pub fn compress(data: &[u8], options: &CompressOptions) -> crate::Result<Vec<u8>> {
     let mut out = Vec::new();
-    compress_stream(data, &mut out, options, &mut |_| {}).map_err(|e| e.to_string())?;
+    compress_stream(data, &mut out, options, &mut |_| {})?;
     Ok(out)
 }
 
 /// Compress everything `src` yields into a .paw stream written to `dst`, a few blocks at a
-/// time, so memory stays bounded by `workers` blocks. Returns the number of input bytes;
-/// `progress` gets the input bytes compressed so far after each block, and once at the end.
+/// time, so memory stays bounded by `workers` blocks. Returns the number of input bytes.
+///
+/// `progress` gets the number of input bytes compressed so far after each block, and once
+/// at the end.
+///
+/// ```no_run
+/// use std::fs::File;
+/// use std::io::{BufReader, BufWriter};
+///
+/// let mut options = pawzip::CompressOptions::default();
+/// options.extension = Some("txt".into());
+/// let src = BufReader::new(File::open("notes.txt")?);
+/// let dst = BufWriter::new(File::create("notes.paw")?);
+/// pawzip::compress_stream(src, dst, &options, &mut |done| eprintln!("{done} bytes"))?;
+/// # Ok::<(), Box<dyn std::error::Error>>(())
+/// ```
 pub fn compress_stream<R: Read, W: Write>(
     mut src: R,
     mut dst: W,
-    options: &Options,
+    options: &CompressOptions,
     progress: &mut dyn FnMut(u64),
 ) -> crate::Result<u64> {
     let extension = check_options(options).map_err(Error::Invalid)?;
-    let io = |e: std::io::Error| Error::Io(e.to_string());
     dst.write_all(&header(options.block_size, extension.as_deref()))
-        .map_err(io)?;
+        .map_err(Error::Io)?;
     let encode = |block: &[u8]| encode_block(block, options.modes.as_deref(), options.thorough);
     let workers = if cfg!(target_family = "wasm") {
         1
@@ -340,7 +382,7 @@ pub fn compress_stream<R: Read, W: Write>(
             (&mut src)
                 .take(options.block_size)
                 .read_to_end(&mut block)
-                .map_err(io)?;
+                .map_err(Error::Io)?;
             if block.is_empty() {
                 break;
             }
@@ -361,13 +403,13 @@ pub fn compress_stream<R: Read, W: Write>(
             })
         };
         for (block, f) in group.iter().zip(framed) {
-            dst.write_all(&f).map_err(io)?;
+            dst.write_all(&f).map_err(Error::Io)?;
             total += block.len() as u64;
             progress(total);
         }
     }
-    dst.write_all(&end(total)).map_err(io)?;
-    dst.flush().map_err(io)?;
+    dst.write_all(&end(total)).map_err(Error::Io)?;
+    dst.flush().map_err(Error::Io)?;
     progress(total);
     Ok(total)
 }

@@ -127,7 +127,7 @@ impl<R: std::io::Read> StreamSource<R> {
 }
 
 fn io_error(e: std::io::Error) -> crate::error::Error {
-    crate::error::Error::Io(e.to_string())
+    crate::error::Error::Io(e)
 }
 
 impl<R: std::io::Read> Source for StreamSource<R> {

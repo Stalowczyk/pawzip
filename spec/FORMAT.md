@@ -1,6 +1,6 @@
 # The pawzip file format (`.paw`) — version 1
 
-Status: implemented by the Python reference implementation (`python/src/paw`) and the Rust core (`rust/pawzip-core`), which write identical files; shared test vectors live in `vectors/`. **Frozen** on 2026-10-14: every valid v1 file decodes to the same bytes forever, and any change a decoder must understand needs a new `version`. Later edits to this text may only clarify it.
+Status: implemented by the Python reference implementation (`python/src/paw`) and the Rust library (`rust/pawzip`), which write identical files; shared test vectors live in `vectors/`. **Frozen** on 2026-10-14: every valid v1 file decodes to the same bytes forever, and any change a decoder must understand needs a new `version`. Later edits to this text may only clarify it.
 
 ## Conventions
 

@@ -26,7 +26,7 @@ fn file_name(path: &Path) -> String {
 /// The extension to store for `suffix` (".png" -> "png"), if it can be stored.
 fn storable(suffix: &str) -> Option<String> {
     let ext = suffix.strip_prefix('.').unwrap_or(suffix);
-    let ok = !ext.is_empty() && pawzip_core::container::extension_allowed(ext.as_bytes());
+    let ok = !ext.is_empty() && pawzip::extension_allowed(ext);
     ok.then(|| ext.to_string())
 }
 

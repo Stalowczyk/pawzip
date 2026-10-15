@@ -1,14 +1,12 @@
 //! Decoding with several workers gives exactly what one worker gives: the same data, or the
 //! same error for a damaged file.
 
-use pawzip_core::{compress, decompress, DecodeOptions, Options};
+use pawzip::{compress, decompress, CompressOptions, DecompressOptions};
 
 fn decode(blob: &[u8], workers: usize) -> Result<Vec<u8>, String> {
-    let options = DecodeOptions {
-        workers,
-        ..Default::default()
-    };
-    decompress(blob, options).map_err(|e| e.to_string())
+    let mut options = DecompressOptions::default();
+    options.workers = workers;
+    decompress(blob, &options).map_err(|e| e.to_string())
 }
 
 #[test]
@@ -16,10 +14,8 @@ fn workers_agree_with_one_worker() {
     let data: Vec<u8> = (0..40_000u32)
         .map(|i| b"the walk, the map and the series "[(i * 5 % 33) as usize] ^ (i / 9000) as u8)
         .collect();
-    let options = Options {
-        block_size: 3000,
-        ..Default::default()
-    };
+    let mut options = CompressOptions::default();
+    options.block_size = 3000;
     let blob = compress(&data, &options).unwrap();
     for workers in [2, 3, 8] {
         assert!(decode(&blob, workers).unwrap() == data);

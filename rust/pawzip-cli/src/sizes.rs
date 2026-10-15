@@ -1,7 +1,6 @@
 //! Parsing option values (sizes such as `64K`, modes, worker counts) and printing numbers.
 
-use pawzip_core::container::FORMAT_MAX_BLOCK_SIZE;
-use pawzip_core::Mode;
+use pawzip::{Mode, FORMAT_MAX_BLOCK_SIZE};
 
 /// Peak memory per block byte, for `--workers auto` (see the Python `paw.parallel`).
 pub const COMPRESS_MEMORY_PER_BYTE: u64 = 100;
@@ -132,7 +131,18 @@ fn available_memory() -> Option<u64> {
     Some(kib * 1024)
 }
 
-pub use pawzip_core::error::group_thousands;
+/// 1234567 -> "1,234,567", as the Python package prints numbers.
+pub fn group_thousands(n: u64) -> String {
+    let digits = n.to_string();
+    let mut out = String::new();
+    for (i, c) in digits.chars().enumerate() {
+        if i > 0 && (digits.len() - i).is_multiple_of(3) {
+            out.push(',');
+        }
+        out.push(c);
+    }
+    out
+}
 
 #[cfg(test)]
 mod tests {

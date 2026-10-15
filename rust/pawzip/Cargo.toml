@@ -1,0 +1,16 @@
+[package]
+name = "pawzip"
+description = "Lossless compressor that records where each byte value occurs and describes those positions with series. Reads and writes .paw files."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+readme = "README.md"
+keywords = ["compression", "compressor", "lossless", "burrows-wheeler", "range-coder"]
+categories = ["compression"]
+include = ["src/**/*", "README.md", "LICENSE"]
+
+[dependencies]
+divsufsort = "2.0.0"

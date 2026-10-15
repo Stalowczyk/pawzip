@@ -18,7 +18,7 @@ fn main() {
         let blob = std::fs::read(&path).unwrap();
         let original = std::fs::read(path.with_extension("orig")).unwrap();
         let start = Instant::now();
-        let data = pawzip_core::decompress(&blob, Default::default()).unwrap();
+        let data = pawzip::decompress(&blob, &Default::default()).unwrap();
         let s = start.elapsed().as_secs_f64();
         assert!(data == original, "{}: mismatch", path.display());
         println!(

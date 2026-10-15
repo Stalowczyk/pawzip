@@ -34,14 +34,12 @@ fn round_trip_with_names_from_the_stored_extension() {
     assert!(out.status.success(), "{out:?}");
     assert_eq!(std::fs::read(dir.join("renamed.txt")).unwrap(), data);
     // the output is identical to the library's
-    let options = pawzip_core::Options {
-        block_size: 8192,
-        extension: Some("txt".into()),
-        ..Default::default()
-    };
+    let mut options = pawzip::CompressOptions::default();
+    options.block_size = 8192;
+    options.extension = Some("txt".into());
     assert_eq!(
         std::fs::read(dir.join("renamed.paw")).unwrap(),
-        pawzip_core::compress(&data, &options).unwrap()
+        pawzip::compress(&data, &options).unwrap()
     );
     let _ = std::fs::remove_dir_all(&dir);
 }

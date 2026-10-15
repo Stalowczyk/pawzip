@@ -10,10 +10,8 @@ fn main() {
         .map(|e| e.unwrap().path())
         .collect();
     entries.sort();
-    let options = pawzip_core::Options {
-        block_size: 1 << 20,
-        ..Default::default()
-    };
+    let mut options = pawzip::CompressOptions::default();
+    options.block_size = 1 << 20;
     let (mut same, mut total, mut bytes, mut secs) = (0, 0, 0usize, 0f64);
     for path in entries
         .into_iter()
@@ -21,12 +19,12 @@ fn main() {
     {
         let data = std::fs::read(&path).unwrap();
         let start = Instant::now();
-        let blob = pawzip_core::compress(&data, &options).unwrap();
+        let blob = pawzip::compress(&data, &options).unwrap();
         let s = start.elapsed().as_secs_f64();
         let python = std::fs::read(path.with_extension("paw")).unwrap();
         let identical = blob == python;
         assert_eq!(
-            pawzip_core::decompress(&blob, Default::default()).unwrap(),
+            pawzip::decompress(&blob, &Default::default()).unwrap(),
             data
         );
         println!(

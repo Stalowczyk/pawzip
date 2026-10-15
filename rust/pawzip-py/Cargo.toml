@@ -12,6 +12,6 @@ name = "_core"
 crate-type = ["cdylib"]
 
 [dependencies]
-pawzip-core = { path = "../pawzip-core" }
+pawzip = { path = "../pawzip" }
 # abi3: one wheel per platform for every Python from 3.10 on
 pyo3 = { version = "0.23", features = ["abi3-py310"] }

@@ -98,7 +98,7 @@ Around them it uses well-known techniques:
 ```
 spec/          the .paw format spec + test vectors every implementation must pass
 python/        the Python package (`pawzip`, import `paw`): API, CLI and the pure-Python reference
-rust/          the Rust core (pawzip-core), the package's native module (pawzip-py) and a
+rust/          the Rust library (pawzip), the package's native module (pawzip-py) and a
                standalone `paw` command (pawzip-cli)
 ```
 
@@ -113,7 +113,7 @@ python -m venv .venv
 
 .venv/bin/python -m pytest python                  # all tests, on the Rust core
 PAW_PURE=1 .venv/bin/python -m pytest python       # the pure-Python reference
-cd rust && cargo test --release -p pawzip-core -p pawzip-cli   # the Rust tests
+cd rust && cargo test --release -p pawzip -p pawzip-cli        # the Rust tests
 ```
 
 The pure-Python implementation is the reference: the Rust core writes exactly the same

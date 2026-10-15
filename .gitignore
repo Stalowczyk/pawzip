@@ -6,7 +6,7 @@ __pycache__/
 
 # test vectors and fuzzer regressions are committed on purpose
 !spec/vectors/**/*.paw
-!rust/pawzip-core/tests/regressions/*.paw
+!rust/pawzip/tests/regressions/*.paw
 .coverage
 .coverage.*
 .hypothesis/

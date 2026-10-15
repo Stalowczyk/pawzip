@@ -17,9 +17,7 @@ use std::sync::Mutex;
 use std::time::Instant;
 
 use clap::{CommandFactory, Parser, Subcommand};
-use pawzip_core::container::{read_header, DEFAULT_MAX_BLOCK_SIZE};
-use pawzip_core::varint::StreamSource;
-use pawzip_core::{DecodeOptions, Mode, Options};
+use pawzip::{CompressOptions, DecompressOptions, Mode, DEFAULT_MAX_BLOCK_SIZE};
 
 use names::{compressed_name, decompressed_name, SUFFIX};
 use progress::ProgressLine;
@@ -197,15 +195,14 @@ fn run(command: &Command, name: &str) -> Result<(), String> {
             } else {
                 compressed_name(Path::new(name))
             };
-            let options = Options {
-                block_size: *block_size,
-                modes: (!modes.is_empty()).then(|| modes.clone()),
-                workers: workers.count(*block_size, sizes::COMPRESS_MEMORY_PER_BYTE),
-                extension,
-                thorough: *thorough,
-            };
+            let mut options = CompressOptions::default();
+            options.block_size = *block_size;
+            options.modes = (!modes.is_empty()).then(|| modes.clone());
+            options.workers = workers.count(*block_size, sizes::COMPRESS_MEMORY_PER_BYTE);
+            options.extension = extension;
+            options.thorough = *thorough;
             let (place, original, written) = convert(out, name, default, |src, dst, progress| {
-                pawzip_core::compress_stream(src, dst, &options, progress)
+                pawzip::compress_stream(src, dst, &options, progress)
             })?;
             let ratio = if original > 0 {
                 format!("{:.1}%", 100.0 * written as f64 / original as f64)
@@ -231,13 +228,12 @@ fn run(command: &Command, name: &str) -> Result<(), String> {
             let mut default = None;
             if name != STDIO && out.output.is_none() && !out.stdout {
                 // the output name depends on the stored extension
-                let mut source = StreamSource::new(open(name)?);
-                let header = read_header(&mut source).map_err(|e| e.to_string())?;
+                let header = pawzip::read_header(open(name)?).map_err(|e| e.to_string())?;
                 default = decompressed_name(Path::new(name), header.extension.as_deref());
             }
             let options = decode_options(limits, workers);
             let (place, original, _) = convert(out, name, default, |src, dst, progress| {
-                pawzip_core::decompress_stream(src, dst, options, progress)
+                pawzip::decompress_stream(src, dst, &options, progress)
             })?;
             say(
                 out,
@@ -250,10 +246,10 @@ fn run(command: &Command, name: &str) -> Result<(), String> {
             let src = input(name)?;
             let total = input_size(name);
             let mut line = ProgressLine::start(name, total, show_progress(false, false));
-            let result = pawzip_core::decompress_stream(
+            let result = pawzip::decompress_stream(
                 src,
                 io::sink(),
-                decode_options(limits, workers),
+                &decode_options(limits, workers),
                 &mut |done| line.update(done),
             );
             line.finish();
@@ -261,7 +257,7 @@ fn run(command: &Command, name: &str) -> Result<(), String> {
             println!("{name}: OK ({} bytes)", group_thousands(size));
         }
         Command::Info { .. } => {
-            let meta = pawzip_core::info_stream(input(name)?).map_err(|e| e.to_string())?;
+            let meta = pawzip::info_stream(input(name)?).map_err(|e| e.to_string())?;
             let ratio = if meta.original_size > 0 {
                 meta.compressed_size as f64 / meta.original_size as f64
             } else {
@@ -281,19 +277,19 @@ fn run(command: &Command, name: &str) -> Result<(), String> {
                 group_thousands(meta.modes.len() as u64),
                 group_thousands(meta.block_size),
                 mode_summary(&meta.modes),
-                pawzip_core::container::FORMAT_VERSION
+                pawzip::FORMAT_VERSION
             );
         }
     }
     Ok(())
 }
 
-fn decode_options(limits: &Limits, workers: &Workers) -> DecodeOptions {
-    DecodeOptions {
-        max_size: limits.max_size,
-        max_block_size: Some(limits.max_block_size),
-        workers: workers.count(limits.max_block_size, sizes::DECODE_MEMORY_PER_BYTE),
-    }
+fn decode_options(limits: &Limits, workers: &Workers) -> DecompressOptions {
+    let mut options = DecompressOptions::default();
+    options.max_size = limits.max_size;
+    options.max_block_size = Some(limits.max_block_size);
+    options.workers = workers.count(limits.max_block_size, sizes::DECODE_MEMORY_PER_BYTE);
+    options
 }
 
 /// The block modes as text: "bwt-mtf-map", or "bwt-mtf-map x3, map x1" (most common first).
@@ -378,11 +374,7 @@ fn convert(
     out: &Output,
     name: &str,
     default: Option<PathBuf>,
-    mut convert: impl FnMut(
-        Box<dyn Read>,
-        &mut dyn Write,
-        &mut dyn FnMut(u64),
-    ) -> pawzip_core::Result<u64>,
+    mut convert: impl FnMut(Box<dyn Read>, &mut dyn Write, &mut dyn FnMut(u64)) -> pawzip::Result<u64>,
 ) -> Result<(String, u64, u64), String> {
     let to_stdout = out.stdout || (name == STDIO && out.output.is_none());
     let src = input(name)?;

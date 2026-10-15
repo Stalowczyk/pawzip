@@ -1,16 +1,22 @@
 [package]
 name = "pawzip-cli"
-description = "The `paw` command: compress and decompress .paw files (pawzip)"
+description = "The paw command: compress, decompress, test and inspect .paw files (pawzip)"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+readme = "README.md"
+keywords = ["compression", "compressor", "lossless", "cli", "paw"]
+categories = ["compression", "command-line-utilities"]
+include = ["src/**/*", "README.md", "LICENSE"]
 
 [[bin]]
 name = "paw"
 path = "src/main.rs"
 
 [dependencies]
-pawzip-core = { path = "../pawzip-core" }
+pawzip = { path = "../pawzip", version = "1.0.0" }
 clap = { version = "4.5", features = ["derive"] }
 ctrlc = "3.4"

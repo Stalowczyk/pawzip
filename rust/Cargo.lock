@@ -248,26 +248,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe"
 
 [[package]]
-name = "pawzip-cli"
-version = "1.0.0"
-dependencies = [
- "clap",
- "ctrlc",
- "pawzip-core",
-]
-
-[[package]]
-name = "pawzip-core"
+name = "pawzip"
 version = "1.0.0"
 dependencies = [
  "divsufsort",
 ]
 
 [[package]]
+name = "pawzip-cli"
+version = "1.0.0"
+dependencies = [
+ "clap",
+ "ctrlc",
+ "pawzip",
+]
+
+[[package]]
 name = "pawzip-py"
 version = "1.0.0"
 dependencies = [
- "pawzip-core",
+ "pawzip",
  "pyo3",
 ]
 

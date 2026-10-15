@@ -7,28 +7,50 @@ use crate::transforms::{inverse_bwt, inverse_delta, inverse_mtf, walk_count, x86
 use crate::varint::{Reader, Source, StreamSource};
 use std::io::{Read, Write};
 
+/// The first three bytes of every .paw file.
 pub const MAGIC: &[u8; 3] = b"PAW";
+/// The format version this crate reads and writes, stored right after [`MAGIC`].
 pub const FORMAT_VERSION: u8 = 1;
+/// The block size [`compress`](crate::compress) uses unless told otherwise: 16 MiB.
 pub const DEFAULT_BLOCK_SIZE: u64 = 16 * 1024 * 1024;
+/// The default [`DecompressOptions::max_block_size`]: 64 MiB.
 pub const DEFAULT_MAX_BLOCK_SIZE: u64 = 64 * 1024 * 1024;
+/// The largest block size the format allows: 2<sup>32</sup> - 1 bytes.
 pub const FORMAT_MAX_BLOCK_SIZE: u64 = (1 << 32) - 1;
+/// The longest file extension a .paw file can store, in bytes.
 pub const MAX_EXTENSION: usize = 16;
 /// Optional header data that decoders skip (written empty by v1 encoders; see the spec).
 pub const MAX_HEADER_EXTRA: u64 = 1 << 16;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+/// How a block is coded. Each block of a .paw file has its own mode, and the encoder picks
+/// the one that gives the smallest block.
+///
+/// Every mode except [`Stored`](Mode::Stored) ends with the position map: for each byte
+/// value, the positions where it occurs, described by series where they pay off.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum Mode {
+    /// The bytes as they are, for data that doesn't compress.
     Stored = 0,
+    /// The position map of the bytes.
     Map = 1,
+    /// Burrows–Wheeler transform, move-to-front, position map.
     BwtMtfMap = 2,
+    /// Delta filter (each byte minus the one a fixed distance before it), position map. For
+    /// smooth images and signals.
     DeltaMap = 3,
+    /// Delta filter, Burrows–Wheeler transform, move-to-front, position map.
     DeltaBwtMtfMap = 4,
+    /// Burrows–Wheeler transform, position map.
     BwtMap = 5,
+    /// Delta filter, Burrows–Wheeler transform, position map.
     DeltaBwtMap = 6,
+    /// x86 call filter (for executables), Burrows–Wheeler transform, position map.
     X86BwtMap = 7,
 }
 
 impl Mode {
+    /// The mode stored as this byte in a block header, or `None` if no mode uses it.
     pub fn from_byte(b: u8) -> Option<Mode> {
         Some(match b {
             0 => Mode::Stored,
@@ -43,6 +65,8 @@ impl Mode {
         })
     }
 
+    /// The mode's name as the `paw` command and the Python package spell it, such as
+    /// `"bwt-map"`.
     pub fn label(self) -> &'static str {
         match self {
             Mode::Stored => "stored",
@@ -83,27 +107,50 @@ impl Mode {
     }
 }
 
-pub fn extension_allowed(ext: &[u8]) -> bool {
+impl std::fmt::Display for Mode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.label())
+    }
+}
+
+/// Whether a file extension (without the dot) can be stored in a .paw file: up to
+/// [`MAX_EXTENSION`] ASCII letters, digits, `-` or `_`.
+pub fn extension_allowed(extension: impl AsRef<[u8]>) -> bool {
+    let ext = extension.as_ref();
     ext.len() <= MAX_EXTENSION
         && ext
             .iter()
             .all(|&c| c.is_ascii_alphanumeric() || c == b'-' || c == b'_')
 }
 
-/// Limits for untrusted input (see the Python `decompress`), and how many blocks to decode
-/// at once.
+/// How to decompress: limits for untrusted input, and how many blocks to decode at once.
+///
+/// Both limits are checked against the block headers before anything large is allocated,
+/// so a small hostile file can't make the decoder use much memory.
+///
+/// ```
+/// let mut options = pawzip::DecompressOptions::default();
+/// options.max_size = Some(100 * 1024 * 1024); // refuse more than 100 MiB of output
+/// ```
 #[derive(Clone, Copy, Debug)]
-pub struct DecodeOptions {
+#[non_exhaustive]
+pub struct DecompressOptions {
+    /// Refuse data that would decompress to more than this many bytes, with
+    /// [`Error::SizeLimit`]. `None` (the default) means no limit.
     pub max_size: Option<u64>,
+    /// Refuse blocks larger than this, with [`Error::SizeLimit`]; this bounds the memory used
+    /// per block. The default is [`DEFAULT_MAX_BLOCK_SIZE`]. `None` means no limit: only for
+    /// files you trust.
     pub max_block_size: Option<u64>,
-    /// Blocks decoded at once, each in its own thread (1 = no threads; WebAssembly always
-    /// uses 1). Memory grows with it: about 20 times the block size per worker.
+    /// Blocks decoded at the same time, each in its own thread. 1 (the default) starts no
+    /// threads, and builds for WebAssembly always use 1. Each worker needs about 7 times the
+    /// block size in memory.
     pub workers: usize,
 }
 
-impl Default for DecodeOptions {
+impl Default for DecompressOptions {
     fn default() -> Self {
-        DecodeOptions {
+        DecompressOptions {
             max_size: None,
             max_block_size: Some(DEFAULT_MAX_BLOCK_SIZE),
             workers: 1,
@@ -111,12 +158,33 @@ impl Default for DecodeOptions {
     }
 }
 
+/// The header at the start of a .paw file, read by [`read_header`].
+#[derive(Clone, Debug, PartialEq, Eq)]
+#[non_exhaustive]
 pub struct Header {
+    /// The block size the file was written with: no block holds more original bytes.
     pub block_size: u64,
+    /// The original file's extension, without the dot, if one was stored.
     pub extension: Option<String>,
 }
 
-pub fn read_header<S: Source>(r: &mut S) -> Result<Header> {
+/// Read only the header at the start of a .paw stream: its block size and stored extension.
+/// The rest is not read or checked (the reading is buffered, so `src` may be read a little
+/// past the header).
+///
+/// ```
+/// let mut options = pawzip::CompressOptions::default();
+/// options.extension = Some("txt".into());
+/// let paw = pawzip::compress(b"hello", &options)?;
+/// let header = pawzip::read_header(&paw[..])?;
+/// assert_eq!(header.extension.as_deref(), Some("txt"));
+/// # Ok::<(), pawzip::Error>(())
+/// ```
+pub fn read_header<R: Read>(src: R) -> Result<Header> {
+    parse_header(&mut StreamSource::new(src))
+}
+
+pub(crate) fn parse_header<S: Source>(r: &mut S) -> Result<Header> {
     if r.bytes(3)? != MAGIC {
         return format("not a .paw file");
     }
@@ -160,7 +228,7 @@ pub fn next_block<S: Source>(
     r: &mut S,
     block_size: u64,
     total: &mut u64,
-    limits: DecodeOptions,
+    limits: DecompressOptions,
 ) -> Result<Option<BlockHeader>> {
     let n = r.varint()?;
     if n == 0 {
@@ -206,6 +274,7 @@ pub fn next_block<S: Source>(
     }))
 }
 
+/// Decode one block body of `n` original bytes (without checking its CRC).
 pub fn decompress_block(mode: Mode, body: &[u8], n: usize) -> Result<Vec<u8>> {
     if mode == Mode::Stored {
         if body.len() != n {
@@ -261,26 +330,51 @@ fn decompress_checked(block: &BlockHeader, body: &[u8]) -> Result<Vec<u8>> {
 }
 
 /// Decompress a complete .paw file held in memory.
-pub fn decompress(blob: &[u8], options: DecodeOptions) -> Result<Vec<u8>> {
+///
+/// Every block's CRC-32 is checked. For files from untrusted sources, the default
+/// [`DecompressOptions`] already caps the block size; set
+/// [`max_size`](DecompressOptions::max_size) as well to cap the total output.
+///
+/// ```
+/// let paw = pawzip::compress(b"abracadabra", &Default::default())?;
+/// let data = pawzip::decompress(&paw, &Default::default())?;
+/// assert_eq!(data, b"abracadabra");
+/// # Ok::<(), pawzip::Error>(())
+/// ```
+pub fn decompress(data: &[u8], options: &DecompressOptions) -> Result<Vec<u8>> {
     let mut out = Vec::new();
-    decompress_stream(blob, &mut out, options, &mut |_| {})?;
+    decompress_stream(data, &mut out, options, &mut |_| {})?;
     Ok(out)
 }
 
-/// Decompress a .paw stream from `src` into `dst`, block by block; returns the bytes
-/// written. `progress` gets the number of .paw bytes read so far after each block, and once
-/// at the end.
+/// Decompress a .paw stream from `src` into `dst` block by block, so memory stays bounded
+/// by the block size (times the number of workers). Returns the number of bytes written.
 ///
-/// With several workers, the headers of the next few blocks are read first and their bodies
-/// decoded at once; errors are still reported in file order, as one worker would.
+/// `progress` gets the number of .paw bytes read so far after each block, and once at the
+/// end. If an error stops it, `dst` holds the blocks decoded before the error.
+///
+/// With several workers, the next few blocks are read first and decoded at once; errors
+/// are still reported in file order, as with one worker.
+///
+/// ```no_run
+/// use std::fs::File;
+/// use std::io::{BufReader, BufWriter};
+///
+/// let src = BufReader::new(File::open("notes.paw")?);
+/// let dst = BufWriter::new(File::create("notes.txt")?);
+/// let written = pawzip::decompress_stream(src, dst, &Default::default(), &mut |_| {})?;
+/// println!("{written} bytes");
+/// # Ok::<(), Box<dyn std::error::Error>>(())
+/// ```
 pub fn decompress_stream<R: Read, W: Write>(
     src: R,
     mut dst: W,
-    options: DecodeOptions,
+    options: &DecompressOptions,
     progress: &mut dyn FnMut(u64),
 ) -> Result<u64> {
+    let options = *options;
     let mut r = StreamSource::new(src);
-    let header = read_header(&mut r)?;
+    let header = parse_header(&mut r)?;
     let workers = if cfg!(target_family = "wasm") {
         1
     } else {
@@ -323,39 +417,55 @@ pub fn decompress_stream<R: Read, W: Write>(
         };
         for (data, (_, _, consumed)) in decoded.into_iter().zip(&group) {
             let data = data?;
-            dst.write_all(&data).map_err(|e| Error::Io(e.to_string()))?;
+            dst.write_all(&data).map_err(Error::Io)?;
             written += data.len() as u64;
             progress(*consumed);
         }
         if stop? {
-            dst.flush().map_err(|e| Error::Io(e.to_string()))?;
+            dst.flush().map_err(Error::Io)?;
             progress(r.consumed());
             return Ok(written);
         }
     }
 }
 
-/// Facts about a .paw file, read from its headers without decompressing it.
-#[derive(Debug, Clone)]
+/// Facts about a .paw file, read from its headers by [`info`] or [`info_stream`].
+#[derive(Clone, Debug, PartialEq, Eq)]
+#[non_exhaustive]
 pub struct Info {
+    /// The size of the data after decompressing, in bytes.
     pub original_size: u64,
+    /// The size of the .paw data, in bytes.
     pub compressed_size: u64,
+    /// The block size the file was written with: no block holds more original bytes.
     pub block_size: u64,
+    /// The mode of each block, in order.
     pub modes: Vec<Mode>,
+    /// The original file's extension, without the dot, if one was stored.
     pub extension: Option<String>,
 }
 
-pub fn info(blob: &[u8]) -> Result<Info> {
-    info_stream(blob)
+/// Describe a .paw file held in memory, from its headers, without decompressing it. The
+/// block bodies and their checksums are not checked.
+///
+/// ```
+/// let paw = pawzip::compress(&[7; 1000], &Default::default())?;
+/// let info = pawzip::info(&paw)?;
+/// assert_eq!(info.original_size, 1000);
+/// assert_eq!(info.compressed_size, paw.len() as u64);
+/// # Ok::<(), pawzip::Error>(())
+/// ```
+pub fn info(data: &[u8]) -> Result<Info> {
+    info_stream(data)
 }
 
 /// [`info`] for a .paw stream: reads the headers and skips the block bodies.
 pub fn info_stream<R: Read>(src: R) -> Result<Info> {
     let mut r = StreamSource::new(src);
-    let header = read_header(&mut r)?;
+    let header = parse_header(&mut r)?;
     let mut total = 0;
     let mut modes = Vec::new();
-    let limits = DecodeOptions {
+    let limits = DecompressOptions {
         max_size: None,
         max_block_size: None,
         workers: 1,

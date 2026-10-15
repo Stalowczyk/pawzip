@@ -5,8 +5,8 @@
 use std::time::Instant;
 
 fn main() {
-    let mut options = pawzip_core::Options::default();
-    let mut decode = pawzip_core::DecodeOptions::default();
+    let mut options = pawzip::CompressOptions::default();
+    let mut decode = pawzip::DecompressOptions::default();
     let mut args = std::env::args().skip(1);
     while let Some(arg) = args.next() {
         match arg.as_str() {
@@ -19,10 +19,10 @@ fn main() {
             path => {
                 let data = std::fs::read(path).unwrap();
                 let start = Instant::now();
-                let blob = pawzip_core::compress(&data, &options).unwrap();
+                let blob = pawzip::compress(&data, &options).unwrap();
                 let c = start.elapsed().as_secs_f64();
                 let start = Instant::now();
-                let back = pawzip_core::decompress(&blob, decode).unwrap();
+                let back = pawzip::decompress(&blob, &decode).unwrap();
                 let d = start.elapsed().as_secs_f64();
                 assert!(back == data);
                 println!(

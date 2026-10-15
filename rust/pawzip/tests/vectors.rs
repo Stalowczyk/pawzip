@@ -20,10 +20,10 @@ fn all_vectors_decode_exactly() {
         let input = name.split(".mode").next().unwrap();
         let expected = fs::read(vectors().join(format!("{input}.bin"))).unwrap();
         let blob = fs::read(&path).unwrap();
-        let data = pawzip_core::decompress(&blob, Default::default())
+        let data = pawzip::decompress(&blob, &Default::default())
             .unwrap_or_else(|e| panic!("{name}: {e}"));
         assert!(data == expected, "{name}: decoded data differs");
-        let info = pawzip_core::info(&blob).unwrap();
+        let info = pawzip::info(&blob).unwrap();
         assert_eq!(info.original_size, expected.len() as u64, "{name}");
         checked += 1;
     }
@@ -46,14 +46,12 @@ fn encoder_reproduces_every_vector() {
             Some((m, b)) => (m, b.parse().unwrap()),
             None => (spec, 16 * 1024 * 1024),
         };
-        let mode = pawzip_core::Mode::from_byte(mode.parse().unwrap()).unwrap();
+        let mode = pawzip::Mode::from_byte(mode.parse().unwrap()).unwrap();
         let data = fs::read(vectors().join(format!("{input}.bin"))).unwrap();
-        let options = pawzip_core::Options {
-            block_size,
-            modes: Some(vec![mode]),
-            ..Default::default()
-        };
-        let blob = pawzip_core::compress(&data, &options).unwrap();
+        let mut options = pawzip::CompressOptions::default();
+        options.block_size = block_size;
+        options.modes = Some(vec![mode]);
+        let blob = pawzip::compress(&data, &options).unwrap();
         assert!(
             blob == fs::read(&path).unwrap(),
             "{name}: encoder output differs from Python's"
@@ -77,7 +75,7 @@ fn unusual_vectors_decode_exactly() {
         let name = path.file_name().unwrap().to_str().unwrap();
         let input = name.split('.').next().unwrap();
         let expected = fs::read(dir.join(format!("{input}.bin"))).unwrap();
-        let data = pawzip_core::decompress(&fs::read(&path).unwrap(), Default::default())
+        let data = pawzip::decompress(&fs::read(&path).unwrap(), &Default::default())
             .unwrap_or_else(|e| panic!("{name}: {e}"));
         assert!(data == expected, "{name}: decoded data differs");
         checked += 1;
@@ -97,7 +95,7 @@ fn invalid_vectors_are_rejected() {
         }
         let blob = fs::read(&path).unwrap();
         assert!(
-            pawzip_core::decompress(&blob, Default::default()).is_err(),
+            pawzip::decompress(&blob, &Default::default()).is_err(),
             "{} was accepted",
             path.display()
         );
@@ -114,7 +112,7 @@ fn fuzzer_regressions_are_rejected() {
         let path = entry.unwrap().path();
         let blob = fs::read(&path).unwrap();
         assert!(
-            pawzip_core::decompress(&blob, Default::default()).is_err(),
+            pawzip::decompress(&blob, &Default::default()).is_err(),
             "{}",
             path.display()
         );
@@ -132,7 +130,7 @@ fn damaged_walk_rows_are_rejected() {
             for flip in [0x01, 0x40, 0xff] {
                 let mut damaged = blob.clone();
                 damaged[i] ^= flip;
-                if let Ok(data) = pawzip_core::decompress(&damaged, Default::default()) {
+                if let Ok(data) = pawzip::decompress(&damaged, &Default::default()) {
                     assert!(data == expected, "mode {mode}, byte {i}");
                 }
             }

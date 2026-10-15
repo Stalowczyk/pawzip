@@ -10,9 +10,9 @@
 use std::panic;
 use std::path::Path;
 
-use pawzip_core::{Error, Mode, Options};
+use pawzip::{CompressOptions, Error, Mode};
 
-fn options(spec: &str) -> Options {
+fn options(spec: &str) -> CompressOptions {
     let parts: Vec<&str> = spec.split_whitespace().collect();
     let modes = (parts[0] != "auto").then(|| {
         parts[0]
@@ -20,18 +20,18 @@ fn options(spec: &str) -> Options {
             .map(|m| Mode::from_byte(m.parse().unwrap()).unwrap())
             .collect()
     });
-    Options {
-        block_size: parts[1].parse().unwrap(),
-        modes,
-        thorough: parts[2] == "1",
-        extension: (parts[3] != "-").then(|| parts[3].to_string()),
-        workers: 2,
-    }
+    let mut options = CompressOptions::default();
+    options.block_size = parts[1].parse().unwrap();
+    options.modes = modes;
+    options.thorough = parts[2] == "1";
+    options.extension = (parts[3] != "-").then(|| parts[3].to_string());
+    options.workers = 2;
+    options
 }
 
 fn decode_outcome(blob: &[u8]) -> String {
-    match panic::catch_unwind(|| pawzip_core::decompress(blob, Default::default())) {
-        Ok(Ok(data)) => format!("ok {} {:08x}", data.len(), pawzip_core::crc32::crc32(&data)),
+    match panic::catch_unwind(|| pawzip::decompress(blob, &Default::default())) {
+        Ok(Ok(data)) => format!("ok {} {:08x}", data.len(), pawzip::internal::crc32(&data)),
         Ok(Err(Error::Format(_))) => "err format".into(),
         Ok(Err(Error::SizeLimit(_))) => "err sizelimit".into(),
         Ok(Err(e)) => format!("err other {e}"), // I/O or options: not expected in memory
@@ -50,7 +50,7 @@ fn main() {
                 let data = std::fs::read(&path).unwrap();
                 let spec = std::fs::read_to_string(path.with_extension("opt")).unwrap();
                 let opts = options(&spec);
-                let blob = match panic::catch_unwind(|| pawzip_core::compress(&data, &opts)) {
+                let blob = match panic::catch_unwind(|| pawzip::compress(&data, &opts)) {
                     Ok(Ok(blob)) => blob,
                     Ok(Err(e)) => format!("ERROR {e}").into_bytes(),
                     Err(_) => b"PANIC".to_vec(),

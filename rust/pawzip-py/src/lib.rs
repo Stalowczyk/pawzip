@@ -4,7 +4,7 @@
 //! stay in Python (`paw.blocks` calls these functions when the module is available). Both
 //! release the GIL, so blocks can be coded in parallel threads.
 
-use pawzip_core::{container, encoder, Error, Mode};
+use pawzip::{Error, Mode};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
@@ -42,7 +42,7 @@ fn compress_block<'py>(
         .map(|m| m.into_iter().map(mode).collect::<PyResult<Vec<_>>>())
         .transpose()?;
     let (mode, body) =
-        py.allow_threads(|| encoder::compress_block(data, modes.as_deref(), thorough));
+        py.allow_threads(|| pawzip::internal::compress_block(data, modes.as_deref(), thorough));
     Ok((mode as u8, PyBytes::new(py, &body)))
 }
 
@@ -55,7 +55,7 @@ fn decompress_block<'py>(
     n: usize,
 ) -> PyResult<Bound<'py, PyBytes>> {
     let m = mode(mode_byte)?;
-    match py.allow_threads(|| container::decompress_block(m, body, n)) {
+    match py.allow_threads(|| pawzip::internal::decompress_block(m, body, n)) {
         Ok(data) => Ok(PyBytes::new(py, &data)),
         Err(e) => Err(to_py(py, e)),
     }

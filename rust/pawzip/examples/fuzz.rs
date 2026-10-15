@@ -43,16 +43,11 @@ fn seeds() -> Vec<Vec<u8>> {
             }
         })
         .collect();
-    for modes in [
-        vec![pawzip_core::Mode::Map],
-        vec![pawzip_core::Mode::DeltaBwtMtfMap],
-    ] {
-        let options = pawzip_core::Options {
-            block_size: 2000,
-            modes: Some(modes),
-            ..Default::default()
-        };
-        out.push(pawzip_core::compress(&image, &options).unwrap());
+    for modes in [vec![pawzip::Mode::Map], vec![pawzip::Mode::DeltaBwtMtfMap]] {
+        let mut options = pawzip::CompressOptions::default();
+        options.block_size = 2000;
+        options.modes = Some(modes);
+        out.push(pawzip::compress(&image, &options).unwrap());
     }
     out
 }
@@ -103,7 +98,7 @@ fn main() {
         let mut blob = seeds[rng.below(seeds.len())].clone();
         mutate(&mut rng, &mut blob);
         let t = Instant::now();
-        let outcome = panic::catch_unwind(|| pawzip_core::decompress(&blob, Default::default()));
+        let outcome = panic::catch_unwind(|| pawzip::decompress(&blob, &Default::default()));
         slowest = slowest.max(t.elapsed().as_secs_f64());
         match outcome {
             Ok(Ok(_)) => ok += 1,

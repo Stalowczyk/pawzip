@@ -66,4 +66,13 @@ jobs:
       - uses: actions/checkout@v6
       - run: cargo fmt --check
       - run: cargo clippy --all-targets -- -D warnings
-      - run: cargo test --release -p pawzip-core -p pawzip-cli
+      - run: cargo test --release -p pawzip -p pawzip-cli
+      - name: The library's docs build without warnings
+        run: cargo doc --no-deps -p pawzip
+        env:
+          RUSTDOCFLAGS: -D warnings
+      - name: The published crates build with the oldest supported Rust (rust-version)
+        run: |
+          msrv=$(sed -n 's/^rust-version = "\(.*\)"$/\1/p' Cargo.toml)
+          rustup toolchain install "$msrv" --profile minimal
+          cargo "+$msrv" check -p pawzip -p pawzip-cli
