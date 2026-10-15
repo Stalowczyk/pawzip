@@ -26,8 +26,9 @@ assert paw.decompress(blob) == b"hello world\n" * 1000
 The full Python API, command line and limitations are documented in
 [python/README.md](python/README.md), which is also the package's PyPI page.
 
-Without Python, the same `paw` command is a standalone Rust binary:
-`cargo install --path rust/pawzip-cli` (same options, messages and files).
+For Rust, the library is [`pawzip` on crates.io](https://crates.io/crates/pawzip)
+([documentation](https://docs.rs/pawzip)). The same `paw` command also comes as a standalone
+Rust binary, without Python: `cargo install pawzip-cli` (same options, messages and files).
 
 ## How it compares
 

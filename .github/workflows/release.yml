@@ -1,8 +1,10 @@
 name: Release
 
 # Pushing a tag vX.Y.Z builds the wheels and the source package and tests each of them, uploads
-# them to TestPyPI, and after approval in the "pypi" environment uploads the same files to PyPI
-# and creates the GitHub release. Started by hand, it only builds and tests.
+# them to TestPyPI, and after approval in the "pypi" and "crates-io" environments (both wait at
+# the same time, so one review approves both) uploads the same files to PyPI, publishes the
+# Rust crates to crates.io and creates the GitHub release. Started by hand, it only builds and
+# tests.
 on:
   push:
     tags: ["v*"]
@@ -145,9 +147,37 @@ jobs:
           merge-multiple: true
       - uses: pypa/gh-action-pypi-publish@release/v1
 
+  crates-io:
+    name: Upload to crates.io
+    needs: testpypi
+    runs-on: ubuntu-latest
+    environment:
+      name: crates-io  # requires approval
+      url: https://crates.io/crates/pawzip
+    permissions:
+      id-token: write  # trusted publishing
+    steps:
+      - uses: actions/checkout@v6
+      - uses: rust-lang/crates-io-auth-action@v1
+        id: auth
+      - name: Publish pawzip, then pawzip-cli (skipping a version already there, for re-runs)
+        working-directory: rust
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          for crate in pawzip pawzip-cli; do
+            if curl -sf -A "pawzip release (github.com/Stalowczyk/pawzip)" \
+                "https://crates.io/api/v1/crates/$crate/$version" > /dev/null; then
+              echo "$crate $version is already on crates.io"
+            else
+              cargo publish -p "$crate"
+            fi
+          done
+
   github-release:
     name: GitHub release
-    needs: pypi
+    needs: [pypi, crates-io]
     runs-on: ubuntu-latest
     permissions:
       contents: write
