@@ -42,7 +42,7 @@ fn compress_block<'py>(
         .map(|m| m.into_iter().map(mode).collect::<PyResult<Vec<_>>>())
         .transpose()?;
     let (mode, body) =
-        py.allow_threads(|| pawzip::internal::compress_block(data, modes.as_deref(), thorough));
+        py.detach(|| pawzip::internal::compress_block(data, modes.as_deref(), thorough));
     Ok((mode as u8, PyBytes::new(py, &body)))
 }
 
@@ -55,7 +55,7 @@ fn decompress_block<'py>(
     n: usize,
 ) -> PyResult<Bound<'py, PyBytes>> {
     let m = mode(mode_byte)?;
-    match py.allow_threads(|| pawzip::internal::decompress_block(m, body, n)) {
+    match py.detach(|| pawzip::internal::decompress_block(m, body, n)) {
         Ok(data) => Ok(PyBytes::new(py, &data)),
         Err(e) => Err(to_py(py, e)),
     }
