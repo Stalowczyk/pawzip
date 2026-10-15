@@ -163,6 +163,20 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           version="${GITHUB_REF_NAME#v}"
-          awk -v head="## [$version] - " 'index($0, head) == 1 {on = 1; next} on && /^## \[/ {exit} on' \
-            CHANGELOG.md > notes.md
+          # GitHub shows every line break in release notes, so each wrapped paragraph and list item
+          # of the changelog section is joined onto one line.
+          awk -v head="## [$version] - " '
+            index($0, head) == 1 { on = 1; next }
+            on && /^## \[/ { exit }
+            on {
+              if ($0 == "" || prev == "" || $0 ~ /^#/ || prev ~ /^#/ || $0 ~ /^[ \t]*([-*+]|[0-9]+\.)[ \t]/) {
+                if (n++) print buf
+                buf = $0
+              } else {
+                line = $0; sub(/^[ \t]+/, "", line); buf = buf " " line
+              }
+              prev = $0
+            }
+            END { if (n) print buf }
+          ' CHANGELOG.md > notes.md
           gh release create "$GITHUB_REF_NAME" dist/* --verify-tag --title "pawzip $version" --notes-file notes.md
