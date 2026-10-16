@@ -1,16 +1,20 @@
 # pawzip
 
-pawzip is a lossless compressor with its own file format, `.paw`. Instead of storing data
-byte by byte, it stores where each byte value appears, and describes those positions with
-series (arithmetic progressions and nested loops) wherever it can.
+A lossless compression algorithm that records where each byte value appears and describes
+those positions with patterns. This crate is its Rust implementation: it reads and writes
+`.paw` files, the same files as the [Python package](https://pypi.org/project/pawzip/). The
+`paw` command is the [`pawzip-cli`](https://crates.io/crates/pawzip-cli) crate.
 
 On the Silesia benchmark it compresses better than bzip2 and nearly as well as xz, but it is
-slower than both. It does best on structured and repetitive data. Data it can't compress,
-such as noise or files that are already compressed, is stored as it is.
+slower than both. It does best on structured and repetitive data, and stores data it can't
+compress, such as noise or files that are already compressed, as it is. The `.paw` format is
+frozen, so files written today will decode with every later version.
 
-This crate is the Rust implementation. It writes exactly the same files as the
-[Python package](https://pypi.org/project/pawzip/), and the `paw` command is the
-[`pawzip-cli`](https://crates.io/crates/pawzip-cli) crate.
+```sh
+cargo add pawzip
+```
+
+Requires Rust 1.87 or newer. The library has no unsafe code.
 
 ## Usage
 
@@ -72,13 +76,12 @@ are tried in parallel threads; decompressing needs about 7 times. Several blocks
 compressed or decompressed at once with `workers`, at that cost per worker. Builds for
 WebAssembly use no threads.
 
-## The format
+## Learn more
 
-Version 1 of the `.paw` format is frozen: every file written today will decode to the same
-bytes with every later version. The complete byte-level specification is
-[FORMAT.md](https://github.com/Stalowczyk/pawzip/blob/main/spec/FORMAT.md), with
-[test vectors](https://github.com/Stalowczyk/pawzip/tree/main/spec/vectors) for anyone
-writing their own decoder.
+- [How it works](https://github.com/Stalowczyk/pawzip/blob/main/docs/how-it-works.md)
+- [The .paw format](https://github.com/Stalowczyk/pawzip/blob/main/spec/FORMAT.md)
+- [Python package](https://pypi.org/project/pawzip/)
+- [Source code](https://github.com/Stalowczyk/pawzip)
 
 ## License
 

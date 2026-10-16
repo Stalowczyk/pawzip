@@ -1,10 +1,19 @@
-# The pawzip file format (`.paw`) — version 1
+# The pawzip file format (`.paw`), version 1
 
-Status: implemented by the Python reference implementation (`python/src/paw`) and the Rust library (`rust/pawzip`), which write identical files; shared test vectors live in `vectors/`. **Frozen** on 2026-10-14: every valid v1 file decodes to the same bytes forever, and any change a decoder must understand needs a new `version`. Later edits to this text may only clarify it.
+This is the complete, byte-level description of version 1 of the `.paw` format: enough to
+write your own encoder or decoder. For the ideas behind it, read
+[How it works](../docs/how-it-works.md) first.
+
+**Status: frozen** since 2026-10-14. Every valid version 1 file decodes to the same bytes
+forever, and any change a decoder must understand needs a new `version`. Later edits to this
+text may only clarify it.
+
+The Python reference implementation (`python/src/paw`) and the Rust library (`rust/pawzip`)
+write identical files, and the test vectors in `vectors/` check both (see "Conformance").
 
 ## Conventions
 
-- **varint**: unsigned LEB128 — 7 bits per byte, lowest bits first, high bit set on every byte except the last. At most 10 bytes, and the value must be below 2⁶⁴. Non-minimal encodings (such as `80 00` for 0) are allowed.
+- **varint**: unsigned LEB128: 7 bits per byte, lowest bits first, high bit set on every byte except the last. At most 10 bytes, and the value must be below 2⁶⁴. Non-minimal encodings (such as `80 00` for 0) are allowed.
 - **u32**: 4 bytes, little-endian.
 - Positions are 0-based byte offsets.
 - The total size must be below 2⁶⁴ (it is stored as a varint); a single block is limited to 4 GiB − 1.
@@ -22,16 +31,16 @@ block       ...
 end         0 (varint) | total original size (varint)
 ```
 
-- `version` — format version `1`. A decoder must refuse versions it doesn't know.
-- `block size` — the largest block in the file. Every block except the last should be
+- `version`: format version `1`. A decoder must refuse versions it doesn't know.
+- `block size`: the largest block in the file. Every block except the last should be
   exactly `B` bytes long (decoders accept any `n ≤ B`). Decoders can use `B` to bound memory
   before decoding anything.
-- `extension` — the original file's extension without the dot (`png`), or nothing
+- `extension`: the original file's extension without the dot (`png`), or nothing
   (`L = 0`). Only ASCII letters, digits, `-` and `_` are allowed. A decompressor that names
   its output after the .paw file replaces `.paw` with it: `abc.paw` holding `png` becomes
   `abc.png`, whatever the file was renamed to. Only the extension is stored, never a name
   or path.
-- `extra` — optional header data for later versions of the format: information a decoder
+- `extra`: optional header data for later versions of the format: information a decoder
   may ignore, such as the original modification time. Version 1 encoders write `X = 0`;
   decoders skip the `X` bytes, and must reject `X` above 65536. Anything a decoder must
   understand needs a new `version` instead.
@@ -44,7 +53,7 @@ end         0 (varint) | total original size (varint)
   must equal the sum of the block sizes. Nothing may follow it.
 - An empty input is a header followed directly by the end record (`0`, `0`).
 
-Encoders choose the mode per block — typically by trying several and keeping the smallest.
+Encoders choose the mode per block, typically by trying several and keeping the smallest.
 The reference encoder uses `B` = 16 MiB by default.
 
 Decoding a block takes memory in proportion to `n`, so decoders may refuse blocks above a
@@ -195,7 +204,7 @@ costs a short symbol and a start, instead of a type and all the parameters.
 
 Positions are counted in **free slots** only. Before a symbol's leftovers are coded, a slot is
 *taken* if it belongs to an earlier symbol (series or leftover) or to this symbol's own series;
-every other slot is free — including all background slots. Let `f` be the number of free slots.
+every other slot is free, including all background slots. Let `f` be the number of free slots.
 
 Each leftover position is replaced by its **rank** among the free slots (0 = the first free
 slot), and the ranks `r₀ < r₁ < …` are stored as gaps `gᵢ = rᵢ − rᵢ₋₁ − 1` (with `r₋₁ = −1`).
@@ -320,7 +329,7 @@ The reference implementation is `python/src/paw/arith.py`.
 
 ## Validation
 
-A decoder must reject a file — with an error, never a crash or a hang — when any of these
+A decoder must reject a file (with an error, never a crash or a hang) when any of these
 holds:
 
 - **Container**: the magic is not `PAW`; the version is unknown; a varint is longer than
