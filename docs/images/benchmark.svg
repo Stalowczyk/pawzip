@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="362" viewBox="0 0 760 362" role="img" aria-labelledby="title desc">
+  <title id="title">paw compared with gzip, bzip2 and xz on the Silesia corpus</title>
+  <desc id="desc">How much smaller (negative) or larger (positive) paw's compressed file is than each tool's, file by file. reymont: gzip -9 -41.8%, bzip2 -9 -14.8%, xz -9 -19.4%; nci: gzip -9 -52.6%, bzip2 -9 -21.9%, xz -9 -18.6%; mr: gzip -9 -38.2%, bzip2 -9 -7.4%, xz -9 -17.8%; dickens: gzip -9 -38.2%, bzip2 -9 -14.9%, xz -9 -15.9%; webster: gzip -9 -40.1%, bzip2 -9 -16.3%, xz -9 -13.7%; osdb: gzip -9 -32.5%, bzip2 -9 -11.6%, xz -9 -13.1%; x-ray: gzip -9 -35.4%, bzip2 -9 -3.6%, xz -9 -13.0%; ooffice: gzip -9 -23.6%, bzip2 -9 -17.5%, xz -9 -2.7%; xml: gzip -9 -32.3%, bzip2 -9 +1.1%, xz -9 -1.6%; sao: gzip -9 -9.2%, bzip2 -9 -2.2%, xz -9 +9.5%; samba: gzip -9 -16.8%, bzip2 -9 -1.2%, xz -9 +19.5%; mozilla: gzip -9 -7.4%, bzip2 -9 -1.5%, xz -9 +31.9%.</desc>
+  <style>
+    text { font-family: ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13px; fill: #1f2328; }
+    .muted { fill: #59636e; }
+    .small { font-size: 11px; }
+    .end { text-anchor: end; }
+    .mid { text-anchor: middle; }
+    .head { font-weight: 600; }
+    .win { fill: #1f883d; }
+    .wint { fill: #1a7f37; font-weight: 600; }
+    .loss { fill: #c4ccd5; }
+    .stripe { fill: #f6f8fa; }
+    .axis { stroke: #8c959f; stroke-width: 1; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e6edf3; }
+      .muted { fill: #9198a1; }
+      .win { fill: #2ea043; }
+      .wint { fill: #3fb950; }
+      .loss { fill: #4a525c; }
+      .stripe { fill: #151b23; }
+      .axis { stroke: #6e7681; }
+    }
+  </style>
+
+  <rect x="12" y="62" width="736" height="24" rx="4" class="stripe"/>
+  <rect x="12" y="110" width="736" height="24" rx="4" class="stripe"/>
+  <rect x="12" y="158" width="736" height="24" rx="4" class="stripe"/>
+  <rect x="12" y="206" width="736" height="24" rx="4" class="stripe"/>
+  <rect x="12" y="254" width="736" height="24" rx="4" class="stripe"/>
+  <rect x="12" y="302" width="736" height="24" rx="4" class="stripe"/>
+  <text x="349.4" y="20" class="mid head">paw vs gzip -9</text>
+  <text x="344.4" y="40" class="end muted small">← smaller</text>
+  <text x="354.4" y="40" class="muted small">larger →</text>
+  <text x="495.0" y="20" class="mid head">paw vs bzip2 -9</text>
+  <text x="490.0" y="40" class="end muted small">← smaller</text>
+  <text x="500.0" y="40" class="muted small">larger →</text>
+  <text x="637.6" y="20" class="mid head">paw vs xz -9</text>
+  <text x="632.6" y="40" class="end muted small">← smaller</text>
+  <text x="642.6" y="40" class="muted small">larger →</text>
+  <text x="20" y="78">reymont</text><text x="78" y="78" class="muted small">Polish text</text>
+  <rect x="262.6" y="66" width="86.8" height="16" rx="3" class="win"/><text x="258.6" y="78" class="end small wint">−41.8%</text>
+  <rect x="464.3" y="66" width="30.7" height="16" rx="3" class="win"/><text x="460.3" y="78" class="end small wint">−14.8%</text>
+  <rect x="597.3" y="66" width="40.3" height="16" rx="3" class="win"/><text x="593.3" y="78" class="end small wint">−19.4%</text>
+  <text x="20" y="102">nci</text><text x="78" y="102" class="muted small">chemical database</text>
+  <rect x="240.0" y="90" width="109.4" height="16" rx="3" class="win"/><text x="236.0" y="102" class="end small wint">−52.6%</text>
+  <rect x="449.4" y="90" width="45.6" height="16" rx="3" class="win"/><text x="445.4" y="102" class="end small wint">−21.9%</text>
+  <rect x="598.9" y="90" width="38.7" height="16" rx="3" class="win"/><text x="594.9" y="102" class="end small wint">−18.6%</text>
+  <text x="20" y="126">mr</text><text x="78" y="126" class="muted small">MRI image</text>
+  <rect x="270.0" y="114" width="79.5" height="16" rx="3" class="win"/><text x="266.0" y="126" class="end small wint">−38.2%</text>
+  <rect x="479.7" y="114" width="15.3" height="16" rx="3" class="win"/><text x="475.7" y="126" class="end small wint">−7.4%</text>
+  <rect x="600.7" y="114" width="36.9" height="16" rx="3" class="win"/><text x="596.7" y="126" class="end small wint">−17.8%</text>
+  <text x="20" y="150">dickens</text><text x="78" y="150" class="muted small">English text</text>
+  <rect x="270.0" y="138" width="79.5" height="16" rx="3" class="win"/><text x="266.0" y="150" class="end small wint">−38.2%</text>
+  <rect x="464.0" y="138" width="31.1" height="16" rx="3" class="win"/><text x="460.0" y="150" class="end small wint">−14.9%</text>
+  <rect x="604.6" y="138" width="33.0" height="16" rx="3" class="win"/><text x="600.6" y="150" class="end small wint">−15.9%</text>
+  <text x="20" y="174">webster</text><text x="78" y="174" class="muted small">dictionary</text>
+  <rect x="266.2" y="162" width="83.3" height="16" rx="3" class="win"/><text x="262.2" y="174" class="end small wint">−40.1%</text>
+  <rect x="461.2" y="162" width="33.9" height="16" rx="3" class="win"/><text x="457.2" y="174" class="end small wint">−16.3%</text>
+  <rect x="609.1" y="162" width="28.5" height="16" rx="3" class="win"/><text x="605.1" y="174" class="end small wint">−13.7%</text>
+  <text x="20" y="198">osdb</text><text x="78" y="198" class="muted small">database</text>
+  <rect x="281.8" y="186" width="67.7" height="16" rx="3" class="win"/><text x="277.8" y="198" class="end small wint">−32.5%</text>
+  <rect x="470.9" y="186" width="24.1" height="16" rx="3" class="win"/><text x="466.9" y="198" class="end small wint">−11.6%</text>
+  <rect x="610.5" y="186" width="27.2" height="16" rx="3" class="win"/><text x="606.5" y="198" class="end small wint">−13.1%</text>
+  <text x="20" y="222">x-ray</text><text x="78" y="222" class="muted small">X-ray image</text>
+  <rect x="275.9" y="210" width="73.5" height="16" rx="3" class="win"/><text x="271.9" y="222" class="end small wint">−35.4%</text>
+  <rect x="487.6" y="210" width="7.4" height="16" rx="3" class="win"/><text x="483.6" y="222" class="end small wint">−3.6%</text>
+  <rect x="610.6" y="210" width="27.0" height="16" rx="3" class="win"/><text x="606.6" y="222" class="end small wint">−13.0%</text>
+  <text x="20" y="246">ooffice</text><text x="78" y="246" class="muted small">program</text>
+  <rect x="300.3" y="234" width="49.1" height="16" rx="3" class="win"/><text x="296.3" y="246" class="end small wint">−23.6%</text>
+  <rect x="458.7" y="234" width="36.3" height="16" rx="3" class="win"/><text x="454.7" y="246" class="end small wint">−17.5%</text>
+  <rect x="632.1" y="234" width="5.5" height="16" rx="3" class="win"/><text x="628.1" y="246" class="end small wint">−2.7%</text>
+  <text x="20" y="270">xml</text><text x="78" y="270" class="muted small">XML</text>
+  <rect x="282.3" y="258" width="67.2" height="16" rx="3" class="win"/><text x="278.3" y="270" class="end small wint">−32.3%</text>
+  <rect x="495.0" y="258" width="2.3" height="16" rx="2" class="loss"/><text x="501.3" y="270" class="small muted">+1.1%</text>
+  <rect x="634.3" y="258" width="3.3" height="16" rx="3" class="win"/><text x="630.3" y="270" class="end small wint">−1.6%</text>
+  <text x="20" y="294">sao</text><text x="78" y="294" class="muted small">star catalog</text>
+  <rect x="330.2" y="282" width="19.2" height="16" rx="3" class="win"/><text x="326.2" y="294" class="end small wint">−9.2%</text>
+  <rect x="490.5" y="282" width="4.5" height="16" rx="3" class="win"/><text x="486.5" y="294" class="end small wint">−2.2%</text>
+  <rect x="637.6" y="282" width="19.7" height="16" rx="2" class="loss"/><text x="661.3" y="294" class="small muted">+9.5%</text>
+  <text x="20" y="318">samba</text><text x="78" y="318" class="muted small">source archive</text>
+  <rect x="314.6" y="306" width="34.9" height="16" rx="3" class="win"/><text x="310.6" y="318" class="end small wint">−16.8%</text>
+  <rect x="492.6" y="306" width="2.4" height="16" rx="3" class="win"/><text x="488.6" y="318" class="end small wint">−1.2%</text>
+  <rect x="637.6" y="306" width="40.5" height="16" rx="2" class="loss"/><text x="682.1" y="318" class="small muted">+19.5%</text>
+  <text x="20" y="342">mozilla</text><text x="78" y="342" class="muted small">program archive</text>
+  <rect x="334.2" y="330" width="15.3" height="16" rx="3" class="win"/><text x="330.2" y="342" class="end small wint">−7.4%</text>
+  <rect x="491.9" y="330" width="3.1" height="16" rx="3" class="win"/><text x="487.9" y="342" class="end small wint">−1.5%</text>
+  <rect x="637.6" y="330" width="66.4" height="16" rx="2" class="loss"/><text x="708.0" y="342" class="small muted">+31.9%</text>
+  <line x1="349.4" y1="56" x2="349.4" y2="358" class="axis"/>
+  <line x1="495.0" y1="56" x2="495.0" y2="358" class="axis"/>
+  <line x1="637.6" y1="56" x2="637.6" y2="358" class="axis"/>
+</svg>

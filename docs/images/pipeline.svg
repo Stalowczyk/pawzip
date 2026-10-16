@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="190" viewBox="0 0 760 190" role="img" aria-labelledby="title desc">
+  <title id="title">From data to a .paw file</title>
+  <desc id="desc">The data is split into blocks of 16 MiB. Each block may get a reversible transform (BWT, MTF, delta or the x86 filter), becomes a position map with a background byte, series and gaps, goes through an adaptive range coder, and is stored as a .paw block with its mode, sizes and a CRC-32. Each block tries several modes and keeps the smallest.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" class="head"/>
+    </marker>
+  </defs>
+  <style>
+    text { font-family: ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 14px; fill: #1f2328; }
+    .muted { fill: #59636e; }
+    .small { font-size: 12px; }
+    .center { text-anchor: middle; }
+    .bold { font-weight: 600; }
+    .box { fill: #f6f8fa; stroke: #d1d9e0; }
+    .main { fill: #ddf4ff; stroke: #54aeff; }
+    .line { stroke: #8c959f; stroke-width: 1.5; fill: none; }
+    .head { fill: #8c959f; }
+    .bt { fill: #0969da; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e6edf3; }
+      .muted { fill: #9198a1; }
+      .box { fill: #151b23; stroke: #3d444d; }
+      .main { fill: #0d2a4d; stroke: #388bfd; }
+      .line { stroke: #6e7681; }
+      .head { fill: #6e7681; }
+      .bt { fill: #58a6ff; }
+    }
+  </style>
+
+  <rect x="14" y="30" width="128" height="80" rx="8" class="box"/>
+  <text x="78" y="60" class="center bold">Blocks</text>
+  <text x="78" y="80" class="center small muted">16 MiB each,</text>
+  <text x="78" y="96" class="center small muted">independent</text>
+
+  <rect x="164" y="30" width="128" height="80" rx="8" class="box"/>
+  <text x="228" y="60" class="center bold">Transform</text>
+  <text x="228" y="80" class="center small muted">optional: BWT, MTF,</text>
+  <text x="228" y="96" class="center small muted">delta, x86 filter</text>
+
+  <rect x="314" y="30" width="128" height="80" rx="8" class="main"/>
+  <text x="378" y="60" class="center bold bt">Position map</text>
+  <text x="378" y="80" class="center small muted">background byte,</text>
+  <text x="378" y="96" class="center small muted">series, gaps</text>
+
+  <rect x="464" y="30" width="128" height="80" rx="8" class="box"/>
+  <text x="528" y="60" class="center bold">Range coder</text>
+  <text x="528" y="80" class="center small muted">adaptive</text>
+  <text x="528" y="96" class="center small muted">arithmetic coding</text>
+
+  <rect x="614" y="30" width="128" height="80" rx="8" class="box"/>
+  <text x="678" y="60" class="center bold">.paw block</text>
+  <text x="678" y="80" class="center small muted">mode, sizes</text>
+  <text x="678" y="96" class="center small muted">and CRC-32</text>
+
+  <line x1="144" y1="70" x2="161" y2="70" class="line" marker-end="url(#arrow)"/>
+  <line x1="294" y1="70" x2="311" y2="70" class="line" marker-end="url(#arrow)"/>
+  <line x1="444" y1="70" x2="461" y2="70" class="line" marker-end="url(#arrow)"/>
+  <line x1="594" y1="70" x2="611" y2="70" class="line" marker-end="url(#arrow)"/>
+
+  <path d="M166 124 v8 h574 v-8" class="line"/>
+  <text x="453" y="156" class="center muted">each block is compressed in several modes, and the smallest result is kept</text>
+</svg>

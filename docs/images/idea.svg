@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="300" viewBox="0 0 760 300" role="img" aria-labelledby="title desc">
+  <title id="title">The idea behind pawzip</title>
+  <desc id="desc">Twelve bytes, A B A B A B A B C A A C. A, the most frequent value, is not stored. B is at positions 1, 3, 5 and 7: a series with start 1, step 2, 4 times. C is at positions 8 and 11: stored as leftovers.</desc>
+  <style>
+    text { font-family: ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 14px; fill: #1f2328; }
+    .mono { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; }
+    .muted { fill: #59636e; }
+    .small { font-size: 12px; }
+    .letter { font-size: 18px; text-anchor: middle; }
+    .center { text-anchor: middle; }
+    .bold { font-weight: 600; }
+    .a { fill: #f6f8fa; stroke: #d1d9e0; }
+    .b { fill: #ddf4ff; stroke: #54aeff; }
+    .c { fill: #fff1e5; stroke: #fb8f44; }
+    .at { fill: #59636e; }
+    .bt { fill: #0969da; }
+    .ct { fill: #bc4c00; }
+    .arc { fill: none; stroke: #54aeff; stroke-width: 1.5; }
+    .rule { stroke: #d1d9e0; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e6edf3; }
+      .muted, .at { fill: #9198a1; }
+      .a { fill: #151b23; stroke: #3d444d; }
+      .b { fill: #0d2a4d; stroke: #388bfd; }
+      .c { fill: #2d1a0a; stroke: #db6d28; }
+      .bt { fill: #58a6ff; }
+      .ct { fill: #f0883e; }
+      .arc { stroke: #388bfd; }
+      .rule { stroke: #3d444d; }
+    }
+  </style>
+
+  <!-- the data -->
+  <text x="20" y="86" class="muted">data</text>
+  <text x="20" y="118" class="muted small">position</text>
+  <g>
+    <rect x="120" y="60" width="44" height="40" rx="6" class="a"/><text x="142" y="86" class="mono letter at">A</text>
+    <rect x="172" y="60" width="44" height="40" rx="6" class="b"/><text x="194" y="86" class="mono letter bt">B</text>
+    <rect x="224" y="60" width="44" height="40" rx="6" class="a"/><text x="246" y="86" class="mono letter at">A</text>
+    <rect x="276" y="60" width="44" height="40" rx="6" class="b"/><text x="298" y="86" class="mono letter bt">B</text>
+    <rect x="328" y="60" width="44" height="40" rx="6" class="a"/><text x="350" y="86" class="mono letter at">A</text>
+    <rect x="380" y="60" width="44" height="40" rx="6" class="b"/><text x="402" y="86" class="mono letter bt">B</text>
+    <rect x="432" y="60" width="44" height="40" rx="6" class="a"/><text x="454" y="86" class="mono letter at">A</text>
+    <rect x="484" y="60" width="44" height="40" rx="6" class="b"/><text x="506" y="86" class="mono letter bt">B</text>
+    <rect x="536" y="60" width="44" height="40" rx="6" class="c"/><text x="558" y="86" class="mono letter ct">C</text>
+    <rect x="588" y="60" width="44" height="40" rx="6" class="a"/><text x="610" y="86" class="mono letter at">A</text>
+    <rect x="640" y="60" width="44" height="40" rx="6" class="a"/><text x="662" y="86" class="mono letter at">A</text>
+    <rect x="692" y="60" width="44" height="40" rx="6" class="c"/><text x="714" y="86" class="mono letter ct">C</text>
+  </g>
+  <g class="mono small muted">
+    <text x="142" y="118" class="center">0</text><text x="194" y="118" class="center">1</text>
+    <text x="246" y="118" class="center">2</text><text x="298" y="118" class="center">3</text>
+    <text x="350" y="118" class="center">4</text><text x="402" y="118" class="center">5</text>
+    <text x="454" y="118" class="center">6</text><text x="506" y="118" class="center">7</text>
+    <text x="558" y="118" class="center">8</text><text x="610" y="118" class="center">9</text>
+    <text x="662" y="118" class="center">10</text><text x="714" y="118" class="center">11</text>
+  </g>
+
+  <!-- B's positions step by 2 -->
+  <path d="M194 56 Q246 30 298 56" class="arc"/>
+  <path d="M298 56 Q350 30 402 56" class="arc"/>
+  <path d="M402 56 Q454 30 506 56" class="arc"/>
+  <text x="246" y="34" class="small center bt">+2</text>
+  <text x="350" y="34" class="small center bt">+2</text>
+  <text x="454" y="34" class="small center bt">+2</text>
+
+  <!-- what gets stored -->
+  <text x="20" y="160" class="muted small">value</text>
+  <text x="120" y="160" class="muted small">positions</text>
+  <text x="330" y="160" class="muted small">stored as</text>
+  <line x1="20" y1="170" x2="736" y2="170" class="rule"/>
+
+  <rect x="20" y="180" width="30" height="30" rx="6" class="a"/><text x="35" y="201" class="mono letter at" style="font-size:15px">A</text>
+  <text x="120" y="201" class="mono">0 2 4 6 9 10</text>
+  <text x="330" y="201"><tspan class="bold at">not stored:</tspan> the most frequent value fills the rest</text>
+
+  <rect x="20" y="220" width="30" height="30" rx="6" class="b"/><text x="35" y="241" class="mono letter bt" style="font-size:15px">B</text>
+  <text x="120" y="241" class="mono">1 3 5 7</text>
+  <text x="330" y="241"><tspan class="bold bt">series:</tspan> start 1, step 2, 4 times</text>
+
+  <rect x="20" y="260" width="30" height="30" rx="6" class="c"/><text x="35" y="281" class="mono letter ct" style="font-size:15px">C</text>
+  <text x="120" y="281" class="mono">8 11</text>
+  <text x="330" y="281"><tspan class="bold ct">leftovers:</tspan> 8, 11</text>
+</svg>

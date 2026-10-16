@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="356" viewBox="0 0 760 356" role="img" aria-labelledby="title desc">
+  <title id="title">The two kinds of series</title>
+  <desc id="desc">An arithmetic series: positions 2, 5, 8, 11 and 14 are start 2, step 3, count 5. A nested loop: drawn 8 positions per row, positions 10, 11, 12, 18, 19 and 20 form a rectangle: start 10, 3 columns with step 1, 2 rows with stride 8.</desc>
+  <style>
+    text { font-family: ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 14px; fill: #1f2328; }
+    .mono { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; }
+    .muted { fill: #59636e; }
+    .small { font-size: 12px; }
+    .center { text-anchor: middle; }
+    .bold { font-weight: 600; }
+    .title { font-size: 15px; font-weight: 600; }
+    .a { fill: #f6f8fa; stroke: #d1d9e0; }
+    .b { fill: #ddf4ff; stroke: #54aeff; }
+    .bt { fill: #0969da; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e6edf3; }
+      .muted { fill: #9198a1; }
+      .a { fill: #151b23; stroke: #3d444d; }
+      .b { fill: #0d2a4d; stroke: #388bfd; }
+      .bt { fill: #58a6ff; }
+    }
+  </style>
+
+  <!-- arithmetic series -->
+  <text x="20" y="24" class="title">Arithmetic series</text>
+  <g>
+    <rect x="20" y="40" width="36" height="36" rx="5" class="a"/>
+    <rect x="62" y="40" width="36" height="36" rx="5" class="a"/>
+    <rect x="104" y="40" width="36" height="36" rx="5" class="b"/>
+    <rect x="146" y="40" width="36" height="36" rx="5" class="a"/>
+    <rect x="188" y="40" width="36" height="36" rx="5" class="a"/>
+    <rect x="230" y="40" width="36" height="36" rx="5" class="b"/>
+    <rect x="272" y="40" width="36" height="36" rx="5" class="a"/>
+    <rect x="314" y="40" width="36" height="36" rx="5" class="a"/>
+    <rect x="356" y="40" width="36" height="36" rx="5" class="b"/>
+    <rect x="398" y="40" width="36" height="36" rx="5" class="a"/>
+    <rect x="440" y="40" width="36" height="36" rx="5" class="a"/>
+    <rect x="482" y="40" width="36" height="36" rx="5" class="b"/>
+    <rect x="524" y="40" width="36" height="36" rx="5" class="a"/>
+    <rect x="566" y="40" width="36" height="36" rx="5" class="a"/>
+    <rect x="608" y="40" width="36" height="36" rx="5" class="b"/>
+    <rect x="650" y="40" width="36" height="36" rx="5" class="a"/>
+  </g>
+  <g class="mono small center">
+    <text x="38" y="63" class="muted">0</text><text x="80" y="63" class="muted">1</text>
+    <text x="122" y="63" class="bt bold">2</text><text x="164" y="63" class="muted">3</text>
+    <text x="206" y="63" class="muted">4</text><text x="248" y="63" class="bt bold">5</text>
+    <text x="290" y="63" class="muted">6</text><text x="332" y="63" class="muted">7</text>
+    <text x="374" y="63" class="bt bold">8</text><text x="416" y="63" class="muted">9</text>
+    <text x="458" y="63" class="muted">10</text><text x="500" y="63" class="bt bold">11</text>
+    <text x="542" y="63" class="muted">12</text><text x="584" y="63" class="muted">13</text>
+    <text x="626" y="63" class="bt bold">14</text><text x="668" y="63" class="muted">15</text>
+  </g>
+  <text x="20" y="108"><tspan class="bold bt">start 2, step 3, count 5</tspan><tspan class="muted"> stands for </tspan><tspan class="mono">2 5 8 11 14</tspan></text>
+
+  <!-- nested loop -->
+  <text x="20" y="158" class="title">Nested loop</text>
+  <g>
+    <rect x="20" y="174" width="36" height="36" rx="5" class="a"/><rect x="62" y="174" width="36" height="36" rx="5" class="a"/>
+    <rect x="104" y="174" width="36" height="36" rx="5" class="a"/><rect x="146" y="174" width="36" height="36" rx="5" class="a"/>
+    <rect x="188" y="174" width="36" height="36" rx="5" class="a"/><rect x="230" y="174" width="36" height="36" rx="5" class="a"/>
+    <rect x="272" y="174" width="36" height="36" rx="5" class="a"/><rect x="314" y="174" width="36" height="36" rx="5" class="a"/>
+
+    <rect x="20" y="216" width="36" height="36" rx="5" class="a"/><rect x="62" y="216" width="36" height="36" rx="5" class="a"/>
+    <rect x="104" y="216" width="36" height="36" rx="5" class="b"/><rect x="146" y="216" width="36" height="36" rx="5" class="b"/>
+    <rect x="188" y="216" width="36" height="36" rx="5" class="b"/><rect x="230" y="216" width="36" height="36" rx="5" class="a"/>
+    <rect x="272" y="216" width="36" height="36" rx="5" class="a"/><rect x="314" y="216" width="36" height="36" rx="5" class="a"/>
+
+    <rect x="20" y="258" width="36" height="36" rx="5" class="a"/><rect x="62" y="258" width="36" height="36" rx="5" class="a"/>
+    <rect x="104" y="258" width="36" height="36" rx="5" class="b"/><rect x="146" y="258" width="36" height="36" rx="5" class="b"/>
+    <rect x="188" y="258" width="36" height="36" rx="5" class="b"/><rect x="230" y="258" width="36" height="36" rx="5" class="a"/>
+    <rect x="272" y="258" width="36" height="36" rx="5" class="a"/><rect x="314" y="258" width="36" height="36" rx="5" class="a"/>
+
+    <rect x="20" y="300" width="36" height="36" rx="5" class="a"/><rect x="62" y="300" width="36" height="36" rx="5" class="a"/>
+    <rect x="104" y="300" width="36" height="36" rx="5" class="a"/><rect x="146" y="300" width="36" height="36" rx="5" class="a"/>
+    <rect x="188" y="300" width="36" height="36" rx="5" class="a"/><rect x="230" y="300" width="36" height="36" rx="5" class="a"/>
+    <rect x="272" y="300" width="36" height="36" rx="5" class="a"/><rect x="314" y="300" width="36" height="36" rx="5" class="a"/>
+  </g>
+  <g class="mono small center">
+    <text x="38" y="197" class="muted">0</text><text x="80" y="197" class="muted">1</text><text x="122" y="197" class="muted">2</text><text x="164" y="197" class="muted">3</text>
+    <text x="206" y="197" class="muted">4</text><text x="248" y="197" class="muted">5</text><text x="290" y="197" class="muted">6</text><text x="332" y="197" class="muted">7</text>
+    <text x="38" y="239" class="muted">8</text><text x="80" y="239" class="muted">9</text><text x="122" y="239" class="bt bold">10</text><text x="164" y="239" class="bt bold">11</text>
+    <text x="206" y="239" class="bt bold">12</text><text x="248" y="239" class="muted">13</text><text x="290" y="239" class="muted">14</text><text x="332" y="239" class="muted">15</text>
+    <text x="38" y="281" class="muted">16</text><text x="80" y="281" class="muted">17</text><text x="122" y="281" class="bt bold">18</text><text x="164" y="281" class="bt bold">19</text>
+    <text x="206" y="281" class="bt bold">20</text><text x="248" y="281" class="muted">21</text><text x="290" y="281" class="muted">22</text><text x="332" y="281" class="muted">23</text>
+    <text x="38" y="323" class="muted">24</text><text x="80" y="323" class="muted">25</text><text x="122" y="323" class="muted">26</text><text x="164" y="323" class="muted">27</text>
+    <text x="206" y="323" class="muted">28</text><text x="248" y="323" class="muted">29</text><text x="290" y="323" class="muted">30</text><text x="332" y="323" class="muted">31</text>
+  </g>
+  <text x="390" y="196" class="muted">the same positions, 8 per row</text>
+  <text x="390" y="230"><tspan class="bold bt">start 10</tspan></text>
+  <text x="390" y="254"><tspan class="bold bt">3 columns</tspan>, step 1</text>
+  <text x="390" y="278"><tspan class="bold bt">2 rows</tspan>, stride 8</text>
+  <text x="390" y="306"><tspan class="muted">stands for </tspan><tspan class="mono">10 11 12 18 19 20</tspan></text>
+  <text x="390" y="332" class="muted small">position = start + row · stride + column · step</text>
+</svg>

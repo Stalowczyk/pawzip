@@ -95,8 +95,8 @@ success, 1 if any file failed, 2 on usage errors and 130 if interrupted.
 - **Speed** (Rust core, Silesia benchmark): on one core, compression runs at about
   1.7 MB/s, close to xz -9, and decompression at about 18 MB/s, a little slower than bzip2
   and about 3x slower than xz. Compression tries its modes in parallel, so with several
-  cores it is faster: about 3.5 MB/s on a 4-core Intel Core i3-12100F. The
-  pure-Python reference (`PAW_PURE=1`) is about 50x slower.
+  cores it is faster: about 3.5 MB/s with four cores. The pure-Python reference
+  (`PAW_PURE=1`) is about 50x slower.
 - **Memory**: compressing needs up to about 100x the block size per worker (about 1.6 GB
   for a full 16 MiB block, when several modes are tried at once); decompressing needs
   about 7x (about 110 MB; 20x in pure Python). Use a smaller `block_size` on machines
