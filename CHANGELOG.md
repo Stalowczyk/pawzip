@@ -4,6 +4,19 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.0.1] - 2026-10-17
+
+### Added
+
+- The Rust library and the `paw` command are now also on crates.io, as `pawzip` and
+  `pawzip-cli`.
+
+### Changed
+
+- The Python package's native module is built with PyO3 0.30 (was 0.23).
+- New documentation: a shorter README, a How it works page with diagrams, a contributing
+  guide, and clearer PyPI and crates.io pages.
+
 ## [1.0.0] - 2026-10-15
 
 The first release, 1.0.0.

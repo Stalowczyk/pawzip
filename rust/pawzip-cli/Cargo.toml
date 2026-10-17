@@ -17,6 +17,6 @@ name = "paw"
 path = "src/main.rs"
 
 [dependencies]
-pawzip = { path = "../pawzip", version = "1.0.0" }
+pawzip = { path = "../pawzip", version = "1.0.1" }
 clap = { version = "4.5", features = ["derive"] }
 ctrlc = "3.4"
