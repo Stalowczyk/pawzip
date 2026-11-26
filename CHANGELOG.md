@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- `max_block_size` also limits a block's compressed data, in Python and Rust: a block whose body
+  is more than twice `max_block_size` plus 1 KiB is refused with `SizeLimitError`, from its
+  header, so a hostile stream can't make the decoder hold a huge body in memory. Files pawzip
+  writes are never refused for this.
+
 ## [1.0.1] - 2026-10-17
 
 ### Added

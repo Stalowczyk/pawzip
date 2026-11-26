@@ -139,8 +139,9 @@ pub struct DecompressOptions {
     /// [`Error::SizeLimit`]. `None` (the default) means no limit.
     pub max_size: Option<u64>,
     /// Refuse blocks larger than this, with [`Error::SizeLimit`]; this bounds the memory used
-    /// per block. The default is [`DEFAULT_MAX_BLOCK_SIZE`]. `None` means no limit: only for
-    /// files you trust.
+    /// per block. A block whose compressed data is more than twice this, plus 1 KiB, is refused
+    /// too (no encoder needs that much). The default is [`DEFAULT_MAX_BLOCK_SIZE`]. `None`
+    /// means no limit: only for files you trust.
     pub max_block_size: Option<u64>,
     /// Blocks decoded at the same time, each in its own thread. 1 (the default) starts no
     /// threads, and builds for WebAssembly always use 1. Each worker needs about 7 times the
@@ -266,6 +267,18 @@ pub fn next_block<S: Source>(
     };
     let crc = u32::from_le_bytes(r.bytes(4)?.try_into().unwrap());
     let body_size = r.varint()?;
+    // A body is never much larger than its block's data, even in a mode forced on data that
+    // doesn't compress, so a far larger one would only take up memory: it's refused before
+    // it's read.
+    if let Some(max) = limits.max_block_size {
+        if body_size > max.saturating_mul(2).saturating_add(1024) {
+            return Err(Error::SizeLimit(format!(
+                "a block's body is {} bytes, more than max_block_size={} allows",
+                group_thousands(body_size),
+                group_thousands(max)
+            )));
+        }
+    }
     Ok(Some(BlockHeader {
         original_size: n,
         mode,

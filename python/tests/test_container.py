@@ -312,6 +312,32 @@ def test_max_block_size():
     assert decompress(compress(data, block_size=2**31)) == data
 
 
+def declared_body(body_size: int) -> bytes:
+    """The start of a .paw stream whose one 1-byte block declares a body of ``body_size`` bytes,
+    and ends there. (Bytes a decoder never reads may pad a body, so such a block can be valid.)"""
+    header = b"PAW\x01" + varint(1) + b"\x00\x00"
+    return header + varint(1) + bytes([Mode.MAP]) + bytes(4) + varint(body_size)
+
+
+def test_max_block_size_refuses_a_far_larger_body_before_reading_it():
+    largest = 2 * 1000 + 1024
+    message = "a block's body is 3,025 bytes, more than max_block_size=1,000 allows"
+    with pytest.raises(SizeLimitError, match=message):
+        decompress(declared_body(largest + 1), max_block_size=1000)
+    with pytest.raises(FormatError, match="unexpected end of data"):  # allowed, then missing
+        decompress(declared_body(largest), max_block_size=1000)
+    with pytest.raises(FormatError, match="unexpected end of data"):  # no limit: waited for
+        decompress(declared_body(2**40), max_block_size=None)
+
+
+def test_max_block_size_allows_bodies_larger_than_their_data():
+    data = random.Random(7).randbytes(100_000)  # doesn't compress: the body is 1.5 KiB larger
+    for mode in (Mode.MAP, Mode.BWT_MTF_MAP, Mode.DELTA_BWT_MAP):
+        blob = compress(data, block_size=len(data), modes=[mode])
+        assert len(blob) > len(data) + 1024
+        assert decompress(blob, max_block_size=len(data)) == data
+
+
 @pytest.mark.slow
 def test_parallel_workers_give_identical_output():
     data = realistic_inputs()["text"]

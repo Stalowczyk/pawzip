@@ -12,4 +12,5 @@ class FormatError(PawError):
 
 class SizeLimitError(PawError):
     """The file would decompress to more bytes than allowed (`max_size`), or holds a block
-    larger than allowed (`max_block_size`, 64 MiB by default)."""
+    larger than allowed (`max_block_size`, 64 MiB by default) or with compressed data far
+    larger than that."""

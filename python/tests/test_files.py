@@ -137,13 +137,19 @@ def test_outputs_get_the_usual_permissions(sample, tmp_path):
         assert stat.S_IMODE(path.stat().st_mode) == 0o640  # 0o666 minus the umask, not 0o600
 
 
-def test_huge_declared_body_is_a_format_error(tmp_path):
+def test_huge_declared_body_is_refused(tmp_path):
     # Read from a real file: buffered file reads pre-allocate the requested size.
     evil = tmp_path / "evil.paw"
     evil.write_bytes(huge_body_header())
-    with pytest.raises(FormatError):
+    # The default max_block_size refuses it from the block header...
+    with pytest.raises(SizeLimitError):
         decompress_file(evil, tmp_path / "out")
-    with paw.open(evil) as f, pytest.raises(FormatError):
+    with paw.open(evil) as f, pytest.raises(SizeLimitError):
+        f.read()
+    # ...and without it, it's found missing, without allocating its declared size.
+    with pytest.raises(FormatError):
+        decompress_file(evil, tmp_path / "out", max_block_size=None)
+    with paw.open(evil, max_block_size=None) as f, pytest.raises(FormatError):
         f.read()
     with open(evil, "rb") as f, pytest.raises(FormatError):
         info(f)

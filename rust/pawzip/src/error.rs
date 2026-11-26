@@ -9,7 +9,7 @@ pub enum Error {
     /// Not a valid .paw file: wrong magic, unsupported version, damaged or truncated data,
     /// or a checksum mismatch.
     Format(String),
-    /// The data would be larger than the caller allowed
+    /// The data, or a block's compressed data, would be larger than the caller allowed
     /// ([`max_size`](crate::DecompressOptions::max_size) or
     /// [`max_block_size`](crate::DecompressOptions::max_block_size)).
     SizeLimit(String),
