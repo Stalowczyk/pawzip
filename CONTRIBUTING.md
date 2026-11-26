@@ -28,12 +28,25 @@ python -m venv .venv
 
 Run the install again after changing Rust code.
 
+The JavaScript package (`js/`) also needs [Node.js](https://nodejs.org) 22.12+, Rust's
+WebAssembly target, and `wasm-bindgen-cli` in the version of `wasm-bindgen` in
+`rust/Cargo.lock` (the build says how to install it when it's missing):
+
+```sh
+rustup target add wasm32-unknown-unknown
+cd js && npm ci && npm run build
+```
+
+Run `npm run build` again after changing Rust code.
+
 ## Tests
 
 ```sh
 .venv/bin/python -m pytest python                  # with the Rust core
 PAW_PURE=1 .venv/bin/python -m pytest python       # with the pure-Python code
 cd rust && cargo test --release -p pawzip -p pawzip-cli
+cd js && npm test && npm run check                 # the npm package, and its types
+cd js && npm run test:browser                      # a quick check in headless Chrome
 ```
 
 ## Pull requests
@@ -56,7 +69,8 @@ can't be accepted.
 ```
 spec/          the .paw format spec + test vectors every implementation must pass
 python/        the Python package (`pawzip`, import `paw`): API, CLI and the pure-Python reference
-rust/          the Rust library (pawzip), the package's native module (pawzip-py) and a
-               standalone `paw` command (pawzip-cli)
+rust/          the Rust library (pawzip), the package's native module (pawzip-py), a
+               standalone `paw` command (pawzip-cli) and the npm package's engine (pawzip-wasm)
+js/            the npm package (`pawzip`): the JavaScript API and its types, over pawzip-wasm
 docs/          how it works, with the diagrams
 ```

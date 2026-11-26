@@ -2,9 +2,9 @@
 
 ## Supported versions
 
-Security fixes go into a new release of each package: `pawzip` on PyPI, and `pawzip` and
-`pawzip-cli` on crates.io. Upgrade to the latest release to get them. The `.paw` format is
-frozen at version 1, so upgrading never changes what a file decodes to.
+Security fixes go into a new release of each package: `pawzip` on PyPI, `pawzip` and
+`pawzip-cli` on crates.io, and `pawzip` on npm. Upgrade to the latest release to get them.
+The `.paw` format is frozen at version 1, so upgrading never changes what a file decodes to.
 
 ## Reporting a problem
 
@@ -15,5 +15,6 @@ that shows the problem if you have one.
 
 Decompressing is meant to be safe on untrusted input: a damaged or hostile `.paw` file should
 fail with an error rather than crash or hang, and the size limits (`max_size` and
-`max_block_size`) should hold, so that a small file can't make the decoder use much memory.
-Anything that breaks this counts as a security problem.
+`max_block_size`, or `maxSize` and `maxBlockSize` in JavaScript) should hold, so that a small
+file can't make the decoder use much memory. Anything that breaks this counts as a security
+problem.

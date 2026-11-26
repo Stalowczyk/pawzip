@@ -9,6 +9,7 @@
 mod container;
 mod encoder;
 mod error;
+mod incremental;
 mod varint;
 
 // Some items of these reach other crates through the hidden `internal` module, undocumented.
@@ -36,7 +37,8 @@ pub use encoder::{compress, compress_stream, CompressOptions};
 pub use error::{Error, Result};
 
 /// Parts of the implementation used by pawzip's own bindings (the Python package's native
-/// module) and examples. Not part of the public API: they can change in any release.
+/// module and the npm package's WebAssembly module) and examples. Not part of the public API:
+/// they can change in any release.
 #[doc(hidden)]
 pub mod internal {
     pub use crate::arith::{Decoder, Encoder, Model};
@@ -44,6 +46,7 @@ pub mod internal {
     pub use crate::crc32::crc32;
     pub use crate::encoder::compress_block;
     pub use crate::freeslots::FreeSlots;
+    pub use crate::incremental::{Compressor, Decompressor};
     pub use crate::mapcodec::{decode_map, encode_map};
     pub use crate::numbers::{get, put, Contexts};
     pub use crate::series::select_series;

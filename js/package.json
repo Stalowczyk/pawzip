@@ -1,0 +1,53 @@
+{
+  "name": "pawzip",
+  "version": "1.0.1",
+  "description": "Lossless compressor that records where each byte value occurs and describes those positions with series. Reads and writes .paw files.",
+  "keywords": [
+    "compression",
+    "compressor",
+    "decompression",
+    "lossless",
+    "burrows-wheeler",
+    "range-coder",
+    "webassembly",
+    "paw"
+  ],
+  "homepage": "https://github.com/Stalowczyk/pawzip/tree/main/js#readme",
+  "bugs": "https://github.com/Stalowczyk/pawzip/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Stalowczyk/pawzip.git",
+    "directory": "js"
+  },
+  "license": "MIT",
+  "author": "Pawel Stalowczyk",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test test/*.test.js test/*.test.cjs",
+    "test:browser": "node scripts/test-browser.mjs",
+    "check": "tsc -p test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3"
+  }
+}

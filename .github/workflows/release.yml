@@ -1,10 +1,18 @@
 name: Release
 
-# Pushing a tag vX.Y.Z builds the wheels and the source package and tests each of them, uploads
-# them to TestPyPI, and after approval in the "pypi" and "crates-io" environments (both wait at
-# the same time, so one review approves both) uploads the same files to PyPI, publishes the
-# Rust crates to crates.io and creates the GitHub release. Started by hand, it only builds and
-# tests.
+# Pushing a tag vX.Y.Z builds the wheels, the source package and the npm package and tests each
+# of them, uploads the Python files to TestPyPI, and after approval in the "pypi", "crates-io"
+# and "npm" environments (all three wait at the same time, so one review approves them) uploads
+# the same files to PyPI, publishes the Rust crates to crates.io and the npm package to npm, and
+# creates the GitHub release. Nothing is published unless all of these were built and tested.
+# Started by hand, it only builds and tests.
+#
+# Before the first release with npm: create the "npm" environment with required reviewers, like
+# "pypi" (an environment a job names is otherwise created without protection). npm's trusted
+# publishing can only be set up for a package that exists, so publish the first version by hand,
+# from this run's npm-package artifact, while the release waits for approval (the npm job skips a
+# version already on npm). Add this workflow as the package's trusted publisher, allowed to run
+# npm publish, shortly before the next release: one that hasn't published within 2 days expires.
 on:
   push:
     tags: ["v*"]
@@ -24,8 +32,10 @@ jobs:
         run: |
           cargo=$(sed -n 's/^version = "\(.*\)"$/\1/p' rust/Cargo.toml | head -n 1)
           python=$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' python/src/paw/__init__.py)
-          echo "rust/Cargo.toml: $cargo, paw.__version__: $python"
+          npm=$(node -p 'require("./js/package.json").version')
+          echo "rust/Cargo.toml: $cargo, paw.__version__: $python, js/package.json: $npm"
           [ "$cargo" = "$python" ] || { echo "::error::rust/Cargo.toml and paw.__version__ differ"; exit 1; }
+          [ "$cargo" = "$npm" ] || { echo "::error::rust/Cargo.toml and js/package.json differ"; exit 1; }
           if [ "$GITHUB_REF_TYPE" = tag ]; then
             [ "$GITHUB_REF_NAME" = "v$cargo" ] || { echo "::error::tag $GITHUB_REF_NAME is not v$cargo"; exit 1; }
             grep -Fq "## [$cargo] - " CHANGELOG.md || { echo "::error::CHANGELOG.md has no '## [$cargo] - date' section"; exit 1; }
@@ -109,10 +119,34 @@ jobs:
           name: dist-sdist
           path: python/dist/*.tar.gz
 
+  npm-package:
+    name: npm package
+    needs: check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: js
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/wasm-toolchain
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+      # No npm ci: the build and the tests need nothing from npm, so nothing from it is run
+      # while making the package that's published.
+      - run: npm run build
+      - run: npm test
+      - run: npm pack
+      # Not named dist-*: those are the Python files, uploaded to PyPI.
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: npm-package
+          path: js/pawzip-*.tgz
+
   testpypi:
     name: Upload to TestPyPI
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [wheels, sdist]
+    needs: [wheels, sdist, npm-package] # every package, so none is published without the others
     runs-on: ubuntu-latest
     environment:
       name: testpypi
@@ -175,9 +209,35 @@ jobs:
             fi
           done
 
+  npm:
+    name: Upload to npm
+    needs: [testpypi, npm-package]
+    runs-on: ubuntu-latest
+    environment:
+      name: npm  # requires approval
+      url: https://www.npmjs.com/package/pawzip
+    permissions:
+      id-token: write  # trusted publishing, which also adds provenance
+    steps:
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"  # its npm is newer than the 11.5.1 that trusted publishing needs
+          registry-url: https://registry.npmjs.org
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: npm-package
+      - name: Publish pawzip (skipping a version already there, for re-runs)
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          if npm view "pawzip@$version" version > /dev/null 2>&1; then
+            echo "pawzip $version is already on npm"
+          else
+            npm publish "pawzip-$version.tgz"
+          fi
+
   github-release:
     name: GitHub release
-    needs: [pypi, crates-io]
+    needs: [pypi, crates-io, npm]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -188,6 +248,10 @@ jobs:
           pattern: dist-*
           path: dist
           merge-multiple: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: npm-package
+          path: dist
       - name: Create the release from the changelog section, with the files
         env:
           GH_TOKEN: ${{ github.token }}

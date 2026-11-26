@@ -1,0 +1,18 @@
+[package]
+name = "pawzip-wasm"
+description = "The pawzip core compiled to WebAssembly (the npm package's engine)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+pawzip = { path = "../pawzip" }
+# The wasm-bindgen command that writes the JavaScript glue must be this crate's exact version,
+# as recorded in Cargo.lock: js/scripts/build.mjs and CI read it from there.
+wasm-bindgen = "0.2.129"
+js-sys = "0.3.106"

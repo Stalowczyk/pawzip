@@ -1,0 +1,19 @@
+name: WebAssembly toolchain
+description: >-
+  Rust's wasm32-unknown-unknown target, and wasm-bindgen-cli in the version of the wasm-bindgen
+  crate in rust/Cargo.lock: its prebuilt release, checked against the release's SHA-256.
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        rustup target add wasm32-unknown-unknown
+        version=$(sed -n '/^name = "wasm-bindgen"$/{n;s/^version = "\(.*\)"$/\1/p;}' "$GITHUB_WORKSPACE/rust/Cargo.lock")
+        name="wasm-bindgen-$version-x86_64-unknown-linux-musl"
+        url="https://github.com/wasm-bindgen/wasm-bindgen/releases/download/$version/$name.tar.gz"
+        cd "$RUNNER_TEMP"
+        curl -sSfL -O "$url" -O "$url.sha256sum"
+        # The .sha256sum file names the archive by another path, so only its hash is used.
+        echo "$(cut -d ' ' -f 1 "$name.tar.gz.sha256sum")  $name.tar.gz" | sha256sum -c -
+        tar -xzf "$name.tar.gz"
+        echo "$RUNNER_TEMP/$name" >> "$GITHUB_PATH"

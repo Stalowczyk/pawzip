@@ -2,6 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/pawzip)](https://pypi.org/project/pawzip/)
 [![crates.io](https://img.shields.io/crates/v/pawzip)](https://crates.io/crates/pawzip)
+[![npm](https://img.shields.io/npm/v/pawzip)](https://www.npmjs.com/package/pawzip)
 [![CI](https://github.com/Stalowczyk/pawzip/actions/workflows/ci.yml/badge.svg)](https://github.com/Stalowczyk/pawzip/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
@@ -20,6 +21,12 @@ pip install pawzip
 
 ```sh
 cargo add pawzip
+```
+
+**JavaScript**: the library, for Node.js, Deno, Bun and browsers
+
+```sh
+npm install pawzip
 ```
 
 **Command line without Python**: the same `paw` command, on its own
@@ -48,6 +55,16 @@ let packed = pawzip::compress(&data, &Default::default())?;
 assert_eq!(pawzip::decompress(&packed, &Default::default())?, data);
 ```
 
+**JavaScript**
+
+```js
+import { compress, decompress } from "pawzip";
+
+const data = new TextEncoder().encode("hello world\n".repeat(1000));
+const packed = compress(data);
+const back = decompress(packed);
+```
+
 **Command line**
 
 ```sh
@@ -69,16 +86,17 @@ a standard compression benchmark, compressed on its own:
 - [How it works](docs/how-it-works.md)
 - [Python API and command line](python/README.md)
 - [Rust API](https://docs.rs/pawzip)
+- [JavaScript API](js/README.md)
 - [The .paw format](spec/FORMAT.md)
 - [Contributing](CONTRIBUTING.md)
 
 ## Status
 
 pawzip is maintained. The `.paw` format is frozen and the library does what it set out to do,
-so new releases keep it working rather than change it: support for new Python and Rust
-versions, updated dependencies, and bug fixes. The tests run on every change and every week,
-and before a release is published its Python packages are built and tested again, the wheels
-on Linux, Windows and macOS.
+so new releases keep it working rather than change it: support for new Python, Rust and
+Node.js versions, updated dependencies, and bug fixes. The tests run on every change and every
+week, and before a release is published its Python and npm packages are built and tested
+again, the Python wheels on Linux, Windows and macOS.
 
 Report bugs and ask questions in [issues](https://github.com/Stalowczyk/pawzip/issues), and
 security problems as described in [SECURITY.md](SECURITY.md).

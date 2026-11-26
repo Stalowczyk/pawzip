@@ -1,5 +1,5 @@
 [workspace]
-members = ["pawzip", "pawzip-py", "pawzip-cli"]
+members = ["pawzip", "pawzip-py", "pawzip-cli", "pawzip-wasm"]
 resolver = "2"
 
 [workspace.package]

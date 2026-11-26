@@ -14,6 +14,7 @@ __pycache__/
 dist/
 build/
 rust/target/
+node_modules/
 
 # the Rust core, built into the package by `pip install -e python`
 python/src/paw/_core.*.so

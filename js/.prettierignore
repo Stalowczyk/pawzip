@@ -1,0 +1,4 @@
+# Written by the build.
+dist/
+# Wrapped by hand, like the rest of the repository's Markdown.
+*.md

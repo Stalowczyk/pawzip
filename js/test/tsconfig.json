@@ -1,0 +1,12 @@
+{
+  // Type-checks types.ts against the published declarations (npm run check).
+  "compilerOptions": {
+    "module": "nodenext",
+    "target": "es2022",
+    "lib": ["es2024", "dom"],
+    "types": [],
+    "strict": true,
+    "noEmit": true
+  },
+  "files": ["types.ts"]
+}

@@ -81,6 +81,7 @@ WebAssembly use no threads.
 - [How it works](https://github.com/Stalowczyk/pawzip/blob/main/docs/how-it-works.md)
 - [The .paw format](https://github.com/Stalowczyk/pawzip/blob/main/spec/FORMAT.md)
 - [Python package](https://pypi.org/project/pawzip/)
+- [JavaScript package](https://www.npmjs.com/package/pawzip)
 - [Source code](https://github.com/Stalowczyk/pawzip)
 
 ## License

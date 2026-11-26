@@ -48,6 +48,21 @@ updates:
         patterns: ["*"]
         update-types: [minor, patch]
 
+  # The npm package has no dependencies of its own: these are its build tools.
+  - package-ecosystem: npm
+    directory: /js
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 14
+    commit-message:
+      prefix: build
+      include: scope
+    groups:
+      js:
+        patterns: ["*"]
+        update-types: [minor, patch]
+
   - package-ecosystem: github-actions
     directory: /
     schedule:

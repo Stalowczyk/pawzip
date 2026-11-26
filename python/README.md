@@ -125,4 +125,5 @@ On a terminal, a progress line shows how far each file has got (`-q` hides it). 
 - [How it works](https://github.com/Stalowczyk/pawzip/blob/main/docs/how-it-works.md)
 - [The .paw format](https://github.com/Stalowczyk/pawzip/blob/main/spec/FORMAT.md)
 - [Rust library](https://crates.io/crates/pawzip)
+- [JavaScript package](https://www.npmjs.com/package/pawzip)
 - [Source code](https://github.com/Stalowczyk/pawzip)

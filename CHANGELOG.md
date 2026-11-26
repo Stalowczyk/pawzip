@@ -6,6 +6,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **JavaScript package** `pawzip` on npm: the Rust core compiled to WebAssembly, for Node.js
+  22.12 or newer, Deno, Bun and browsers. It writes the same files as the Python package and the
+  Rust crate.
+  - `compress`, `decompress` and `info`, the streams `CompressStream` and `DecompressStream`
+    (one block at a time, as they're read, with `onProgress`), and the errors `PawError`,
+    `FormatError` and `SizeLimitError`. Types included.
+  - Safe on untrusted input: `maxSize` and `maxBlockSize` (64 MiB by default) are checked from
+    the headers before anything large is allocated.
+
 ### Changed
 
 - Python 3.15 is supported: the tests run on it, and PyPI lists it.

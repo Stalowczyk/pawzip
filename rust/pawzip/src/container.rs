@@ -334,7 +334,7 @@ pub fn decompress_block(mode: Mode, body: &[u8], n: usize) -> Result<Vec<u8>> {
     Ok(data)
 }
 
-fn decompress_checked(block: &BlockHeader, body: &[u8]) -> Result<Vec<u8>> {
+pub(crate) fn decompress_checked(block: &BlockHeader, body: &[u8]) -> Result<Vec<u8>> {
     let data = decompress_block(block.mode, body, block.original_size as usize)?;
     if crc32(&data) != block.crc32 {
         return format("checksum mismatch: the file is damaged or was written incorrectly");

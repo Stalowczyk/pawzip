@@ -1,0 +1,10 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>running</title>
+<!-- Opened in a headless browser by scripts/test-browser.mjs, which reads the result from the title. -->
+<script type="module">
+  import("./smoke.js").then(
+    () => (document.title = "ok"),
+    (e) => (document.title = `failed: ${e}`),
+  );
+</script>
