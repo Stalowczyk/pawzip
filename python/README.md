@@ -65,8 +65,8 @@ data = paw.decompress(packed, max_size=100 * 1024 * 1024)  # refuse more than 10
 
 Every block is checked with a CRC-32. A small file can claim an enormous size, so set
 `max_size` for input you don't trust: anything bigger is refused before memory is allocated.
-Blocks larger than `max_block_size` (64 MiB by default) are refused the same way; files
-written with the default block size are never affected.
+Blocks larger than `max_block_size` (64 MiB by default), or with compressed data far larger,
+are refused the same way; files written with the default block size are never affected.
 
 ## File information
 

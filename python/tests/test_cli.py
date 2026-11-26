@@ -163,7 +163,8 @@ def test_test_command(sample, tmp_path, capsys):
 def test_huge_declared_body_fails_cleanly(sample, tmp_path, capsys):
     (tmp_path / "evil.paw").write_bytes(huge_body_header())
     assert main(["test", "evil.paw"]) == 1
-    assert "unexpected end of data" in capsys.readouterr().err
+    # Refused from the block header by the default --max-block-size, before the body is read.
+    assert "more than max_block_size=67,108,864 allows" in capsys.readouterr().err
 
 
 def test_max_size_option(sample, capsys):
