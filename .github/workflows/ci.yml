@@ -14,8 +14,8 @@ jobs:
     if: ${{ !github.event.repository.private || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.13"
       - run: pip install -e "python[dev]"
@@ -32,10 +32,10 @@ jobs:
     if: ${{ github.event_name == 'pull_request' && !github.event.repository.private }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.13"
       - run: pip install pre-commit
@@ -64,6 +64,7 @@ jobs:
           - { os: ubuntu-latest, python: "3.12" }
           - { os: ubuntu-latest, python: "3.13" }
           - { os: ubuntu-latest, python: "3.14" }
+          - { os: ubuntu-latest, python: "3.15" }
           - { os: windows-latest, python: "3.13" }
           - { os: macos-latest, python: "3.13" }
     if: ${{ !github.event.repository.private || github.event_name == 'workflow_dispatch' }}
@@ -71,8 +72,8 @@ jobs:
     env:
       HYPOTHESIS_PROFILE: ${{ github.event_name == 'schedule' && 'thorough' || 'default' }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: ${{ matrix.python }}
       - run: pip install -e "python[dev]"  # builds the Rust core (paw._core) too
@@ -90,7 +91,7 @@ jobs:
       run:
         working-directory: rust
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: cargo fmt --check
       - run: cargo clippy --all-targets -- -D warnings
       - run: cargo test --release -p pawzip -p pawzip-cli

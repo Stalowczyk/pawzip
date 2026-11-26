@@ -1,0 +1,62 @@
+# Monthly update pull requests for the dependencies, the pre-commit hooks and the CI actions.
+# Minor and patch updates come grouped, one pull request per ecosystem; a major update comes on
+# its own, so one that needs code changes doesn't hold back the rest. So does PyO3: it's at 0.x,
+# where each minor version can need code changes. A new release waits two weeks before it's
+# offered, so a bad one has time to be caught. CI checks every pull request.
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directory: /rust
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 14
+    commit-message:
+      prefix: build
+      include: scope
+    groups:
+      rust:
+        patterns: ["*"]
+        exclude-patterns: ["pyo3"]
+        update-types: [minor, patch]
+
+  - package-ecosystem: pip
+    directory: /python
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 14
+    commit-message:
+      prefix: build
+      include: scope
+    groups:
+      python:
+        patterns: ["*"]
+        update-types: [minor, patch]
+
+  - package-ecosystem: pre-commit
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 14
+    commit-message:
+      prefix: build
+      include: scope
+    groups:
+      pre-commit:
+        patterns: ["*"]
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 14
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ["*"]
+        update-types: [minor, patch]
