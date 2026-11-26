@@ -316,7 +316,15 @@ def scan_blocks(
         except ValueError:
             raise FormatError("unknown block mode") from None
         crc = int.from_bytes(src.exact(4), "little")
-        yield BlockHeader(n, mode, crc, src.varint())
+        body_size = src.varint()
+        # A body is never much larger than its block's data, even in a mode forced on data that
+        # doesn't compress, so a far larger one would only take up memory: it's refused before
+        # it's read.
+        if max_block_size is not None and body_size > 2 * max_block_size + 1024:
+            raise SizeLimitError(
+                f"a block's body is {body_size:,} bytes, more than max_block_size={max_block_size:,} allows"
+            )
+        yield BlockHeader(n, mode, crc, body_size)
 
 
 DecodeJob = tuple[BlockHeader, bytes, int]  # header, body, .paw bytes read up to its end

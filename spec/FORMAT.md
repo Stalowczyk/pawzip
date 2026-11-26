@@ -57,8 +57,9 @@ Encoders choose the mode per block, typically by trying several and keeping the 
 The reference encoder uses `B` = 16 MiB by default.
 
 Decoding a block takes memory in proportion to `n`, so decoders may refuse blocks above a
-configurable limit. The reference decoder refuses blocks holding more than 64 MiB unless
-the caller raises its limit; encoders should not make larger blocks by default.
+configurable limit. The reference decoder refuses blocks holding more than 64 MiB, or with
+a body more than twice that plus 1 KiB, unless the caller raises its limit; encoders should
+not make larger blocks by default.
 
 ## Modes
 

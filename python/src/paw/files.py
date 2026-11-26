@@ -172,7 +172,7 @@ def decompress_file(
         FileExistsError: ``dst`` exists and ``overwrite`` is false.
         FormatError: ``src`` is not a valid .paw file.
         SizeLimitError: the result would be larger than ``max_size``, or a block larger
-            than ``max_block_size``.
+            than ``max_block_size`` allows.
         OSError: ``src`` can't be read or ``dst`` can't be written.
     """
     src = Path(src)

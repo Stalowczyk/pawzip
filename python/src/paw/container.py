@@ -140,9 +140,10 @@ def decompress(
         max_size: Refuse data that decompresses to more than this many bytes. Use it for
             untrusted input.
         max_block_size: Refuse blocks that hold more than this many bytes (default 64 MiB),
-            since decoding a block needs about 20x its size in memory. Files written with
-            the default block size are never affected; for files written with larger
-            blocks, pass a larger value or ``None`` for no limit.
+            since decoding a block needs about 20x its size in memory, and blocks whose
+            compressed data is more than twice this many plus 1 KiB. Files written with the
+            default block size are never affected; for files written with larger blocks,
+            pass a larger value or ``None`` for no limit.
         workers: Blocks decoded at once (only files with several blocks gain). The default
             of 1 uses no extra threads; ``"auto"`` uses one per CPU core that fits into
             half of the memory currently available.
@@ -153,7 +154,7 @@ def decompress(
     Raises:
         FormatError: ``blob`` is not valid .paw data, is damaged, or fails a checksum.
         SizeLimitError: the data would be larger than ``max_size``, or a block larger than
-            ``max_block_size``.
+            ``max_block_size`` allows.
     """
     return b"".join(iter_decompressed(io.BytesIO(bytes(blob)), max_size, max_block_size, workers=workers))
 
